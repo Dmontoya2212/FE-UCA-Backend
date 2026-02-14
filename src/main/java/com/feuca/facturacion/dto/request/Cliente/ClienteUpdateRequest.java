@@ -12,7 +12,6 @@ import lombok.*;
 public class ClienteUpdateRequest {
 
     @JsonProperty("nombre_razon_social")
-    @NotBlank(message = "El nombre o razón social no puede estar vacío.")
     private String nombreRazonSocial;
 
     @JsonProperty("nif_cif")
