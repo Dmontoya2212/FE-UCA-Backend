@@ -16,7 +16,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
     Optional<Empresa> findByEmail(String email);
     Optional<Empresa> findByTelefono(String telefono);
     Optional<Empresa> findByNombre_comercialAndDireccion(String nombreComercial, String direccion);
-    List<Empresa> findAllByOrderByNombre_legal();
+    List<Empresa> findAllByOrderByNombre_comercial(String nombreComercial);
     List<Empresa> findAllByCiudad(String ciudad);
     List<Empresa> findAllByCodigo_postal(String codigoPostal);
     List<Empresa> findAllByPais(String pais);
