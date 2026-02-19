@@ -1,9 +1,11 @@
 package com.feuca.facturacion.dto.response.Empresa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.feuca.facturacion.dto.response.Moneda.MonedaResponse;
 import lombok.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -43,4 +45,7 @@ public class EmpresaResponse {
 
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
+
+    @JsonProperty("monedas")
+    private List<MonedaResponse> monedas;
 }
