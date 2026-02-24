@@ -4,6 +4,7 @@ import com.feuca.facturacion.dto.response.ApiErrorResponse;
 import com.feuca.facturacion.exception.Empresa.*;
 import com.feuca.facturacion.exception.Item.*;
 import com.feuca.facturacion.exception.IvaTasa.*;
+import com.feuca.facturacion.exception.Cliente.*;
 import org.hibernate.dialect.temptable.SQLServerLocalTemporaryTableStrategy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +70,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ItemIvaNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleItemIvaNotFoundException(ItemIvaNotFoundException e) {
         return buildErrorResponse(e, HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    //Excepciones de Cliente
+    @ExceptionHandler(ClienteAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleClienteAlreadyExistsException(ClienteAlreadyExistsException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(ClienteNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleClienteNotFoundException(ClienteNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
