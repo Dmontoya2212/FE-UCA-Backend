@@ -33,7 +33,7 @@ public class EmpresaMapper {
             EmpresaUpdateRequest empresaUpdate
     ){
         if(empresaUpdate.getNombreLegal() != null) empresa.setNombre_legal(empresaUpdate.getNombreLegal());
-        if(empresaUpdate.getNombreLegal() != null) empresa.setNombre_comercial(empresaUpdate.getNombreComercial());
+        if(empresaUpdate.getNombreComercial() != null) empresa.setNombre_comercial(empresaUpdate.getNombreComercial());
         if(empresaUpdate.getNifCif() != null) empresa.setNif_cif(empresaUpdate.getNifCif());
         if(empresaUpdate.getEmail() != null) empresa.setEmail(empresaUpdate.getEmail());
         if(empresaUpdate.getTelefono() != null) empresa.setTelefono(empresaUpdate.getTelefono());
@@ -58,7 +58,7 @@ public class EmpresaMapper {
                     .codigoPostal(empresa.getCodigo_postal())
                     .pais(empresa.getPais())
                     .createdAt(empresa.getCreated_at())
-                    .monedas(monedas)
+                    .monedas(monedas != null ? monedas : List.of())
                     .build();
     }
 

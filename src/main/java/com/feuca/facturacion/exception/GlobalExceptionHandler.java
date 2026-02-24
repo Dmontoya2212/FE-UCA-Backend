@@ -5,7 +5,7 @@ import com.feuca.facturacion.exception.Empresa.*;
 import com.feuca.facturacion.exception.Item.*;
 import com.feuca.facturacion.exception.IvaTasa.*;
 import com.feuca.facturacion.exception.Cliente.*;
-import org.hibernate.dialect.temptable.SQLServerLocalTemporaryTableStrategy;
+import com.feuca.facturacion.exception.Moneda.MonedaNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -80,6 +80,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ClienteNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleClienteNotFoundException(ClienteNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    //Excepciones de MONEDA
+    @ExceptionHandler(MonedaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleMonedaNotFoundException(MonedaNotFoundException e) {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 
