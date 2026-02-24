@@ -2,6 +2,7 @@ package com.feuca.facturacion.service;
 
 import com.feuca.facturacion.dto.request.Empresa.EmpresaRequest;
 import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
+import com.feuca.facturacion.dto.request.Moneda.AddMonedaRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
 
 import java.util.List;
@@ -26,7 +27,8 @@ public interface EmpresaService {
 
 
     //UPDATE
-    EmpresaResponse update(UUID idEmpresa, EmpresaUpdateRequest empresa);
+    EmpresaResponse update(UUID idEmpresa, EmpresaUpdateRequest empresaRequest);
+    EmpresaResponse updateMonedas(UUID idEmpresa, AddMonedaRequest monedas);
 
     //DELETE
     EmpresaResponse deleteById(UUID id);

@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface EmpresaMonedaRepository extends JpaRepository<EmpresaMoneda, EmpresaMonedaId> {
     //READ
     List<EmpresaMoneda> findAllByEmpresa_id(UUID empresaId);
+    List<EmpresaMoneda> findAllByEmpresa_idIn(List<UUID> empresaIds);
     List<EmpresaMoneda> findAllByMoneda_codigo(String monedaCodigo);
     
     //COUNT

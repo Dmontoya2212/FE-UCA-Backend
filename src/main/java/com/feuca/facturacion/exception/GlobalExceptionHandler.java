@@ -2,6 +2,7 @@ package com.feuca.facturacion.exception;
 
 import com.feuca.facturacion.dto.response.ApiErrorResponse;
 import com.feuca.facturacion.exception.Empresa.*;
+import com.feuca.facturacion.exception.Moneda.MonedaNotFoundException;
 import org.hibernate.dialect.temptable.SQLServerLocalTemporaryTableStrategy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmpresaTelefonoAlredyExistsException.class)
     public ResponseEntity<ApiErrorResponse> handleEmpresaTelefonoAlredyExistsException(EmpresaTelefonoAlredyExistsException e) {
         return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    //Excepciones de MONEDA
+    @ExceptionHandler(MonedaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleMonedaNotFoundException(MonedaNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
