@@ -2,6 +2,8 @@ package com.feuca.facturacion.exception;
 
 import com.feuca.facturacion.dto.response.ApiErrorResponse;
 import com.feuca.facturacion.exception.Empresa.*;
+import com.feuca.facturacion.exception.Item.*;
+import com.feuca.facturacion.exception.IvaTasa.*;
 import org.hibernate.dialect.temptable.SQLServerLocalTemporaryTableStrategy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +42,33 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmpresaTelefonoAlredyExistsException.class)
     public ResponseEntity<ApiErrorResponse> handleEmpresaTelefonoAlredyExistsException(EmpresaTelefonoAlredyExistsException e) {
         return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // Excepciones de IVA TASA
+    @ExceptionHandler(IvaTasaAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleIvaTasaAlreadyExistsException(IvaTasaAlreadyExistsException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(IvaTasaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleIvaTasaNotFoundException(IvaTasaNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    // Excepciones de ITEM
+    @ExceptionHandler(ItemAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleItemAlreadyExistsException(ItemAlreadyExistsException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleItemNotFoundException(ItemNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(ItemIvaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleItemIvaNotFoundException(ItemIvaNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
