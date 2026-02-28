@@ -5,6 +5,11 @@ import com.feuca.facturacion.exception.Empresa.*;
 import com.feuca.facturacion.exception.Item.*;
 import com.feuca.facturacion.exception.IvaTasa.*;
 import com.feuca.facturacion.exception.Cliente.*;
+import com.feuca.facturacion.exception.Usuario.*;
+import com.feuca.facturacion.exception.Factura.FacturaNotFoundException;
+import com.feuca.facturacion.exception.Factura.FacturaAlreadyExistsException;
+import com.feuca.facturacion.exception.Factura.FacturaNoEditableException;
+import com.feuca.facturacion.exception.FacturaLinea.FacturaLineaNotFoundException;
 import com.feuca.facturacion.exception.Moneda.MonedaNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -113,5 +119,39 @@ public class GlobalExceptionHandler {
                 .uri(uri)
                 .build()
         );
+    }
+    // Excepciones de USUARIO
+    @ExceptionHandler(UsuarioAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleUsuarioAlreadyExistsException(UsuarioAlreadyExistsException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(UsuarioNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleUsuarioNotFoundException(UsuarioNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    // Excepciones Factura
+
+    @ExceptionHandler(FacturaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleFacturaNotFoundException(FacturaNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(FacturaAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleFacturaAlreadyExistsException(FacturaAlreadyExistsException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(FacturaNoEditableException.class)
+    public ResponseEntity<ApiErrorResponse> handleFacturaNoEditableException(FacturaNoEditableException e) {
+        return buildErrorResponse(e, HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // Excepciones Factura Linea
+
+    @ExceptionHandler(FacturaLineaNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleFacturaLineaNotFoundException(FacturaLineaNotFoundException e) {
+        return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 }
