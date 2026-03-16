@@ -14,7 +14,7 @@ public class UsuarioMapper {
     public static Usuario toEntityCreate(UsuarioRequest req, String passwordHash) {
         return Usuario.builder()
                 .id(UUID.randomUUID()) // para no depender del default del DB
-                .empresa_id(req.getEmpresaId())
+                .empresaId(req.getEmpresaId())
                 .nombre(req.getNombre())
                 .email(req.getEmail())
                 .password_hash(passwordHash)
@@ -34,7 +34,7 @@ public class UsuarioMapper {
     public static UsuarioResponse toResponse(Usuario u) {
         return UsuarioResponse.builder()
                 .id(u.getId())
-                .empresa_id(u.getEmpresa_id())
+                .empresa_id(u.getEmpresaId())
                 .nombre(u.getNombre())
                 .email(u.getEmail())
                 .es_admin(u.getEs_admin())
