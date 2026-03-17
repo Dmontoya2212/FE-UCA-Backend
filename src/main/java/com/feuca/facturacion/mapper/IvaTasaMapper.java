@@ -10,14 +10,14 @@ import java.util.UUID;
 
 public class IvaTasaMapper {
 
-    public static IvaTasa to_entity(IvaTasaRequest request, UUID empresa_id) {
+    public static IvaTasa to_entity(IvaTasaRequest request, UUID empresaId) {
         return IvaTasa.builder()
                 .id(UUID.randomUUID())
-                .empresa_id(empresa_id)
+                .empresaId(empresaId)
                 .nombre(request.getNombre())
                 .porcentaje(request.getPorcentaje())
-                .created_at(OffsetDateTime.now())
-                .updated_at(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
                 .build();
     }
 
@@ -25,17 +25,17 @@ public class IvaTasaMapper {
         if (request.getNombre() != null) entity.setNombre(request.getNombre());
         if (request.getPorcentaje() != null) entity.setPorcentaje(request.getPorcentaje());
 
-        entity.setUpdated_at(OffsetDateTime.now());
+        entity.setUpdatedAt(OffsetDateTime.now());
     }
 
     public static IvaTasaResponse to_response(IvaTasa entity) {
         return IvaTasaResponse.builder()
                 .id(entity.getId())
-                .empresaId(entity.getEmpresa_id())
+                .empresaId(entity.getEmpresaId())
                 .nombre(entity.getNombre())
                 .porcentaje(entity.getPorcentaje())
-                .createdAt(entity.getCreated_at())
-                .updatedAt(entity.getUpdated_at())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

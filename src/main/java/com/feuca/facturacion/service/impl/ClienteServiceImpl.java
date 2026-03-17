@@ -34,11 +34,11 @@ public class ClienteServiceImpl implements ClienteService {
 
         UUID empresaId = request.getEmpresaId();
 
-        if (request.getNifCif() != null && clienteRepository.existsByEmpresa_idAndNif_cif(empresaId, request.getNifCif())) {
+        if (request.getNifCif() != null && clienteRepository.existsByEmpresaIdAndNifCif(empresaId, request.getNifCif())) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese NIF/CIF para esta empresa.");
         }
 
-        if (request.getEmail() != null && clienteRepository.existsByEmpresa_idAndEmail(empresaId, request.getEmail())) {
+        if (request.getEmail() != null && clienteRepository.existsByEmpresaIdAndEmail(empresaId, request.getEmail())) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese email para esta empresa.");
         }
 
@@ -56,7 +56,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente entity = clienteRepository.findById(id)
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con id: " + id);
         }
 
@@ -67,10 +67,10 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional(readOnly = true)
     public ClienteResponse getByEmpresaIdAndNifCif(UUID empresaId, String nifCif) {
 
-        Cliente entity = clienteRepository.findByEmpresa_idAndNif_cif(empresaId, nifCif)
+        Cliente entity = clienteRepository.findByEmpresaIdAndNifCif(empresaId, nifCif)
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con ese NIF/CIF."));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con ese NIF/CIF.");
         }
 
@@ -81,10 +81,10 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional(readOnly = true)
     public ClienteResponse getByEmpresaIdAndEmail(UUID empresaId, String email) {
 
-        Cliente entity = clienteRepository.findByEmpresa_idAndEmail(empresaId, email)
+        Cliente entity = clienteRepository.findByEmpresaIdAndEmail(empresaId, email)
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con ese email."));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con ese email.");
         }
 
@@ -94,8 +94,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> getAllByEmpresaId(UUID empresaId) {
-        return clienteRepository.findAllByEmpresa_id(empresaId).stream()
-                .filter(c -> c.getDeleted_at() == null)
+        return clienteRepository.findAllByEmpresaId(empresaId).stream()
+                .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
                 .toList();
     }
@@ -103,8 +103,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> getAllActivosByEmpresaId(UUID empresaId) {
-        return clienteRepository.findAllByEmpresa_idAndActivoTrue(empresaId).stream()
-                .filter(c -> c.getDeleted_at() == null)
+        return clienteRepository.findAllByEmpresaIdAndActivoTrue(empresaId).stream()
+                .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
                 .toList();
     }
@@ -112,8 +112,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> searchByNombre(UUID empresaId, String nombre) {
-        return clienteRepository.findAllByEmpresa_idAndNombre_razon_socialContainingIgnoreCase(empresaId, nombre).stream()
-                .filter(c -> c.getDeleted_at() == null)
+        return clienteRepository.findAllByEmpresaIdAndNombreRazonSocialContainingIgnoreCase(empresaId, nombre).stream()
+                .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
                 .toList();
     }
@@ -126,14 +126,14 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente entity = clienteRepository.findById(id)
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con id: " + id);
         }
 
-        UUID empresaId = entity.getEmpresa_id();
+        UUID empresaId = entity.getEmpresaId();
 
         if (request.getNifCif() != null) {
-            clienteRepository.findByEmpresa_idAndNif_cif(empresaId, request.getNifCif())
+            clienteRepository.findByEmpresaIdAndNifCif(empresaId, request.getNifCif())
                     .ifPresent(found -> {
                         if (!found.getId().equals(entity.getId())) {
                             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese NIF/CIF para esta empresa.");
@@ -142,7 +142,7 @@ public class ClienteServiceImpl implements ClienteService {
         }
 
         if (request.getEmail() != null) {
-            clienteRepository.findByEmpresa_idAndEmail(empresaId, request.getEmail())
+            clienteRepository.findByEmpresaIdAndEmail(empresaId, request.getEmail())
                     .ifPresent(found -> {
                         if (!found.getId().equals(entity.getId())) {
                             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese email para esta empresa.");
@@ -164,12 +164,12 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente entity = clienteRepository.findById(id)
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con id: " + id);
         }
 
-        entity.setDeleted_at(OffsetDateTime.now());
-        entity.setUpdated_at(OffsetDateTime.now());
+        entity.setDeletedAt(OffsetDateTime.now());
+        entity.setUpdatedAt(OffsetDateTime.now());
 
         Cliente saved = clienteRepository.save(entity);
         return ClienteMapper.to_response(saved);

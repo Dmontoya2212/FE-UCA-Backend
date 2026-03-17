@@ -20,7 +20,7 @@ public class IvaTasa {
     private UUID id;
 
     @Column(name = "empresa_id", columnDefinition = "uuid")
-    private UUID empresa_id;
+    private UUID empresaId;
 
     @Column(name = "nombre")
     private String nombre;
@@ -29,8 +29,8 @@ public class IvaTasa {
     private BigDecimal porcentaje;
 
     @Column(name = "created_at")
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updated_at;
+    private OffsetDateTime updatedAt;
 }

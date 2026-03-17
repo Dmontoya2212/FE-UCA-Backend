@@ -51,8 +51,8 @@ public class EmpresaServiceImpl implements EmpresaService {
         String correoNormalizado = empresa.getEmail().trim();
         String telefonoNormalizado = empresa.getTelefono().trim();
 
-        boolean existeNombreLegal = empresaRepository.existsByNombre_legal(nombreEmpresaNormalizado);
-        boolean existeNifCif = empresaRepository.existsByNif_cif(nifCifNormalizado);
+        boolean existeNombreLegal = empresaRepository.existsByNombreLegal(nombreEmpresaNormalizado);
+        boolean existeNifCif = empresaRepository.existsByNifCif(nifCifNormalizado);
         boolean existeEmail = empresaRepository.existsByEmail(correoNormalizado);
         boolean existeTelefono = empresaRepository.existsByTelefono(telefonoNormalizado);
 
@@ -91,7 +91,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         String nombreEmpresaNormalizado = nombreLegal.toLowerCase().trim();
 
-        Empresa empresa = empresaRepository.findByNombre_legal(nombreEmpresaNormalizado)
+        Empresa empresa = empresaRepository.findByNombreLegal(nombreEmpresaNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository
@@ -108,7 +108,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         String nifCifNormalizado = nifCif.toLowerCase().trim();
 
-        Empresa empresa = empresaRepository.findByNif_cif(nifCifNormalizado)
+        Empresa empresa = empresaRepository.findByNifCif(nifCifNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository
@@ -160,7 +160,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         String nombreEmpresaNormalizado = nombreComercial.toLowerCase().trim();
         String direccionNormalizada = direccion.toLowerCase().trim();
 
-        Empresa empresa = empresaRepository.findByNombre_comercialAndDireccion(
+        Empresa empresa = empresaRepository.findByNombreComercialAndDireccion(
                 nombreEmpresaNormalizado,
                 direccionNormalizada
         ).orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
@@ -178,7 +178,7 @@ public class EmpresaServiceImpl implements EmpresaService {
     public List<EmpresaResponse> getAllByNombreComercial(String nombreComercial) {
         String nombreEmpresaNormalizado = nombreComercial.toLowerCase().trim();
 
-        List<Empresa> empresas = empresaRepository.findAllByNombre_comercial(nombreEmpresaNormalizado);
+        List<Empresa> empresas = empresaRepository.findAllByNombreComercial(nombreEmpresaNormalizado);
 
         if (empresas.isEmpty()) {
             return List.of();
@@ -236,7 +236,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         String codigoPostalNormalizado = codigoPostal.toLowerCase().trim();
 
-        List<Empresa> empresas = empresaRepository.findAllByCodigo_postal(codigoPostalNormalizado);
+        List<Empresa> empresas = empresaRepository.findAllByCodigoPostal(codigoPostalNormalizado);
 
         if (empresas.isEmpty()) {
             return List.of();
@@ -435,7 +435,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         String nombreNormalizado = nombreLegal.toLowerCase().trim();
 
-        Empresa empresa = empresaRepository.findByNombre_legal(nombreNormalizado)
+        Empresa empresa = empresaRepository.findByNombreLegal(nombreNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository
@@ -454,7 +454,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         String nifCifNormalizado = nifCif.toLowerCase().trim();
 
-        Empresa empresa = empresaRepository.findByNif_cif(nifCifNormalizado)
+        Empresa empresa = empresaRepository.findByNifCif(nifCifNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository

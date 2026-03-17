@@ -8,6 +8,7 @@ import com.feuca.facturacion.service.FacturaLineaService;
 import com.feuca.facturacion.util.ResponseBuilder;
 import jakarta.validation.Valid;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/facturacion/factura-linea")
 public class FacturaLineaController {
     private final FacturaLineaService facturaLineaService;
-
     public FacturaLineaController(FacturaLineaService facturaLineaService) {
         this.facturaLineaService = facturaLineaService;
     }

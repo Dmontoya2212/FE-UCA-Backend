@@ -40,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
 
         UUID empresaId = request.getEmpresaId();
 
-        if (itemRepository.existsByEmpresa_idAndNombre(empresaId, request.getNombre())) {
+        if (itemRepository.existsByEmpresaIdAndNombre(empresaId, request.getNombre())) {
             throw new ItemAlreadyExistsException("Ya existe un item con ese nombre para esta empresa.");
         }
 
@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
         Item entity = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ItemNotFoundException("Item no encontrado con id: " + id);
         }
 
@@ -69,10 +69,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemResponse getByEmpresaIdAndNombre(UUID empresaId, String nombre) {
-        Item entity = itemRepository.findByEmpresa_idAndNombre(empresaId, nombre)
+        Item entity = itemRepository.findByEmpresaIdAndNombre(empresaId, nombre)
                 .orElseThrow(() -> new ItemNotFoundException("Item no encontrado para esa empresa con nombre: " + nombre));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ItemNotFoundException("Item no encontrado para esa empresa con nombre: " + nombre);
         }
 
@@ -82,8 +82,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemResponse> getAllByEmpresaId(UUID empresaId) {
-        return itemRepository.findAllByEmpresa_id(empresaId).stream()
-                .filter(i -> i.getDeleted_at() == null)
+        return itemRepository.findAllByEmpresaId(empresaId).stream()
+                .filter(i -> i.getDeletedAt() == null)
                 .map(ItemMapper::to_response)
                 .toList();
     }
@@ -92,8 +92,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public List<ItemResponse> getAllActivosByEmpresaId(UUID empresaId) {
         // repo devuelve activos true, pero igual filtramos deleted_at
-        return itemRepository.findAllByEmpresa_idAndActivoTrue(empresaId).stream()
-                .filter(i -> i.getDeleted_at() == null)
+        return itemRepository.findAllByEmpresaIdAndActivoTrue(empresaId).stream()
+                .filter(i -> i.getDeletedAt() == null)
                 .map(ItemMapper::to_response)
                 .toList();
     }
@@ -101,8 +101,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemResponse> getAllByEmpresaIdAndCategoria(UUID empresaId, ItemCategoria categoria) {
-        return itemRepository.findAllByEmpresa_idAndCategoria(empresaId, categoria).stream()
-                .filter(i -> i.getDeleted_at() == null)
+        return itemRepository.findAllByEmpresaIdAndCategoria(empresaId, categoria).stream()
+                .filter(i -> i.getDeletedAt() == null)
                 .map(ItemMapper::to_response)
                 .toList();
     }
@@ -110,8 +110,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemResponse> getAllByEmpresaIdAndIvaId(UUID empresaId, UUID ivaId) {
-        return itemRepository.findAllByEmpresa_idAndIva_id(empresaId, ivaId).stream()
-                .filter(i -> i.getDeleted_at() == null)
+        return itemRepository.findAllByEmpresaIdAndIvaId(empresaId, ivaId).stream()
+                .filter(i -> i.getDeletedAt() == null)
                 .map(ItemMapper::to_response)
                 .toList();
     }
@@ -119,8 +119,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemResponse> searchByNombre(UUID empresaId, String nombre) {
-        return itemRepository.findAllByEmpresa_idAndNombreContainingIgnoreCase(empresaId, nombre).stream()
-                .filter(i -> i.getDeleted_at() == null)
+        return itemRepository.findAllByEmpresaIdAndNombreContainingIgnoreCase(empresaId, nombre).stream()
+                .filter(i -> i.getDeletedAt() == null)
                 .map(ItemMapper::to_response)
                 .toList();
     }
@@ -133,14 +133,14 @@ public class ItemServiceImpl implements ItemService {
         Item entity = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ItemNotFoundException("Item no encontrado con id: " + id);
         }
 
-        UUID empresaId = entity.getEmpresa_id();
+        UUID empresaId = entity.getEmpresaId();
 
 
-        itemRepository.findByEmpresa_idAndNombre(empresaId, request.getNombre())
+        itemRepository.findByEmpresaIdAndNombre(empresaId, request.getNombre())
                 .ifPresent(found -> {
                     if (!found.getId().equals(entity.getId())) {
                         throw new ItemAlreadyExistsException("Ya existe un item con ese nombre para esta empresa.");
@@ -164,12 +164,12 @@ public class ItemServiceImpl implements ItemService {
         Item entity = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con id: " + id));
 
-        if (entity.getDeleted_at() != null) {
+        if (entity.getDeletedAt() != null) {
             throw new ItemNotFoundException("Item no encontrado con id: " + id);
         }
 
-        entity.setDeleted_at(OffsetDateTime.now());
-        entity.setUpdated_at(OffsetDateTime.now());
+        entity.setDeletedAt(OffsetDateTime.now());
+        entity.setUpdatedAt(OffsetDateTime.now());
 
         Item saved = itemRepository.save(entity);
 
@@ -181,7 +181,7 @@ public class ItemServiceImpl implements ItemService {
         IvaTasa iva = ivaTasaRepository.findById(ivaId)
                 .orElseThrow(() -> new ItemIvaNotFoundException("El IVA indicado no existe."));
 
-        if (!iva.getEmpresa_id().equals(empresaId)) {
+        if (!iva.getEmpresaId().equals(empresaId)) {
             throw new ItemIvaNotFoundException("El IVA indicado no pertenece a esta empresa.");
         }
     }

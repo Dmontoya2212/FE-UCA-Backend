@@ -19,13 +19,13 @@ public class Cliente {
     private UUID id;
 
     @Column(name = "empresa_id", columnDefinition = "uuid")
-    private UUID empresa_id;
+    private UUID empresaId;
 
     @Column(name = "nombre_razon_social")
-    private String nombre_razon_social;
+    private String nombreRazonSocial;
 
     @Column(name = "nif_cif")
-    private String nif_cif;
+    private String nifCif;
 
     @Column(name = "email")
     private String email;
@@ -37,7 +37,7 @@ public class Cliente {
     private String ciudad;
 
     @Column(name = "codigo_postal")
-    private String codigo_postal;
+    private String codigoPostal;
 
     @Column(name = "telefono")
     private String telefono;
@@ -46,11 +46,11 @@ public class Cliente {
     private Boolean activo;
 
     @Column(name = "created_at")
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updated_at;
+    private OffsetDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private OffsetDateTime deleted_at;
+    private OffsetDateTime deletedAt;
 }

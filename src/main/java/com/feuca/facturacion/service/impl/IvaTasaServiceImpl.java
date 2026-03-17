@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,15 +33,15 @@ public class IvaTasaServiceImpl implements IvaTasaService {
     public IvaTasaResponse create(IvaTasaRequest request) {
 
         UUID empresaId = request.getEmpresaId();
-        double porcentajeDouble = request.getPorcentaje().doubleValue();
+        BigDecimal porcentaje = request.getPorcentaje();
 
-        if (ivaTasaRepository.existsByEmpresa_idAndNombre(empresaId, request.getNombre())) {
+        if (ivaTasaRepository.existsByEmpresaIdAndNombre(empresaId, request.getNombre())) {
             throw new IvaTasaAlreadyExistsException(
                     "Ya existe una tasa de IVA con ese nombre para esta empresa."
             );
         }
 
-        if (ivaTasaRepository.existsByEmpresa_idAndPorcentaje(empresaId, porcentajeDouble)) {
+        if (ivaTasaRepository.existsByEmpresaIdAndPorcentaje(empresaId, porcentaje)) {
             throw new IvaTasaAlreadyExistsException(
                     "Ya existe una tasa de IVA con ese porcentaje para esta empresa."
             );
@@ -58,8 +59,7 @@ public class IvaTasaServiceImpl implements IvaTasaService {
     public IvaTasaResponse getById(UUID id) {
 
         IvaTasa entity = ivaTasaRepository.findById(id)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id)
-                );
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id));
 
         return IvaTasaMapper.to_response(entity);
     }
@@ -69,21 +69,18 @@ public class IvaTasaServiceImpl implements IvaTasaService {
     public IvaTasaResponse getByEmpresaIdAndNombre(UUID empresaId, String nombre) {
 
         IvaTasa entity = ivaTasaRepository
-                .findByEmpresa_idAndNombre(empresaId, nombre)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado para esa empresa con nombre: " + nombre)
-                );
+                .findByEmpresaIdAndNombre(empresaId, nombre)
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado para esa empresa con nombre: " + nombre));
 
         return IvaTasaMapper.to_response(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public IvaTasaResponse getByEmpresaIdAndPorcentaje(UUID empresaId, java.math.BigDecimal porcentaje) {
-
-        double porcentajeDouble = porcentaje.doubleValue();
+    public IvaTasaResponse getByEmpresaIdAndPorcentaje(UUID empresaId, BigDecimal porcentaje) {
 
         IvaTasa entity = ivaTasaRepository
-                .findByEmpresa_idAndPorcentaje(empresaId, porcentajeDouble)
+                .findByEmpresaIdAndPorcentaje(empresaId, porcentaje)
                 .orElseThrow(() ->
                         new IvaTasaNotFoundException("IVA no encontrado para esa empresa con porcentaje: " + porcentaje)
                 );
@@ -95,43 +92,43 @@ public class IvaTasaServiceImpl implements IvaTasaService {
     @Transactional(readOnly = true)
     public List<IvaTasaResponse> getAllByEmpresaId(UUID empresaId) {
 
-        return ivaTasaRepository.findAllByEmpresa_id(empresaId)
+        return ivaTasaRepository.findAllByEmpresaId(empresaId)
                 .stream()
                 .map(IvaTasaMapper::to_response)
                 .toList();
     }
 
     // UPDATE
-
     @Override
     @Transactional
     public IvaTasaResponse update(UUID id, IvaTasaUpdateRequest request) {
 
         IvaTasa entity = ivaTasaRepository.findById(id)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id)
-                );
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id));
 
-        UUID empresaId = entity.getEmpresa_id();
+        UUID empresaId = entity.getEmpresaId();
 
-        double porcentajeDouble = request.getPorcentaje().doubleValue();
+        if (request.getNombre() != null) {
+            ivaTasaRepository.findByEmpresaIdAndNombre(empresaId, request.getNombre())
+                    .ifPresent(found -> {
+                        if (!found.getId().equals(entity.getId())) {
+                            throw new IvaTasaAlreadyExistsException(
+                                    "Ya existe una tasa de IVA con ese nombre para esta empresa."
+                            );
+                        }
+                    });
+        }
 
-        ivaTasaRepository.findByEmpresa_idAndNombre(empresaId, request.getNombre())
-                .ifPresent(found -> {
-                    if (!found.getId().equals(entity.getId())) {
-                        throw new IvaTasaAlreadyExistsException(
-                                "Ya existe una tasa de IVA con ese nombre para esta empresa."
-                        );
-                    }
-                });
-
-        ivaTasaRepository.findByEmpresa_idAndPorcentaje(empresaId, porcentajeDouble)
-                .ifPresent(found -> {
-                    if (!found.getId().equals(entity.getId())) {
-                        throw new IvaTasaAlreadyExistsException(
-                                "Ya existe una tasa de IVA con ese porcentaje para esta empresa."
-                        );
-                    }
-                });
+        if (request.getPorcentaje() != null) {
+            ivaTasaRepository.findByEmpresaIdAndPorcentaje(empresaId, request.getPorcentaje())
+                    .ifPresent(found -> {
+                        if (!found.getId().equals(entity.getId())) {
+                            throw new IvaTasaAlreadyExistsException(
+                                    "Ya existe una tasa de IVA con ese porcentaje para esta empresa."
+                            );
+                        }
+                    });
+        }
 
         IvaTasaMapper.update_entity(entity, request);
 
@@ -140,14 +137,13 @@ public class IvaTasaServiceImpl implements IvaTasaService {
         return IvaTasaMapper.to_response(updated);
     }
 
-    //DELETE
+    // DELETE
     @Override
     @Transactional
     public IvaTasaResponse deleteById(UUID id) {
 
         IvaTasa entity = ivaTasaRepository.findById(id)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id)
-                );
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con id: " + id));
 
         ivaTasaRepository.delete(entity);
 
@@ -159,9 +155,8 @@ public class IvaTasaServiceImpl implements IvaTasaService {
     public IvaTasaResponse deleteByEmpresaIdAndNombre(UUID empresaId, String nombre) {
 
         IvaTasa entity = ivaTasaRepository
-                .findByEmpresa_idAndNombre(empresaId, nombre)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con ese nombre.")
-                );
+                .findByEmpresaIdAndNombre(empresaId, nombre)
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con ese nombre."));
 
         ivaTasaRepository.delete(entity);
 
@@ -170,14 +165,11 @@ public class IvaTasaServiceImpl implements IvaTasaService {
 
     @Override
     @Transactional
-    public IvaTasaResponse deleteByEmpresaIdAndPorcentaje(UUID empresaId, java.math.BigDecimal porcentaje) {
-
-        double porcentajeDouble = porcentaje.doubleValue();
+    public IvaTasaResponse deleteByEmpresaIdAndPorcentaje(UUID empresaId, BigDecimal porcentaje) {
 
         IvaTasa entity = ivaTasaRepository
-                .findByEmpresa_idAndPorcentaje(empresaId, porcentajeDouble)
-                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con ese porcentaje.")
-                );
+                .findByEmpresaIdAndPorcentaje(empresaId, porcentaje)
+                .orElseThrow(() -> new IvaTasaNotFoundException("IVA no encontrado con ese porcentaje."));
 
         ivaTasaRepository.delete(entity);
 

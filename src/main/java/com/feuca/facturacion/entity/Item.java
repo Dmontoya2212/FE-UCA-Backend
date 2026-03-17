@@ -20,7 +20,7 @@ public class Item {
     private UUID id;
 
     @Column(name = "empresa_id", columnDefinition = "uuid")
-    private UUID empresa_id;
+    private UUID empresaId;
 
     @Column(name = "nombre")
     private String nombre;
@@ -33,23 +33,23 @@ public class Item {
     private ItemCategoria categoria;
 
     @Column(name = "iva_id", columnDefinition = "uuid")
-    private UUID iva_id;
+    private UUID ivaId;
 
     @Column(name = "iva_porcentaje_snapshot", precision = 5, scale = 2)
-    private BigDecimal iva_porcentaje_snapshot;
+    private BigDecimal ivaPorcentajeSnapshot;
 
     @Column(name = "precio_sin_iva", precision = 18, scale = 8)
-    private BigDecimal precio_sin_iva;
+    private BigDecimal precioSinIva;
 
     @Column(name = "activo")
     private Boolean activo;
 
     @Column(name = "created_at")
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updated_at;
+    private OffsetDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private OffsetDateTime deleted_at;
+    private OffsetDateTime deletedAt;
 }

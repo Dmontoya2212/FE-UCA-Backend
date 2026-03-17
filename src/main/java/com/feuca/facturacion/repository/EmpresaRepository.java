@@ -10,32 +10,33 @@ import java.util.UUID;
 
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
-    //READ
-    Optional<Empresa> findByNombre_legal(String nombreLegal);
-    Optional<Empresa> findByNif_cif(String nifCif);
+
+    // READ
+    Optional<Empresa> findByNombreLegal(String nombreLegal);
+    Optional<Empresa> findByNifCif(String nifCif);
     Optional<Empresa> findByEmail(String email);
     Optional<Empresa> findByTelefono(String telefono);
-    Optional<Empresa> findByNombre_comercialAndDireccion(String nombreComercial, String direccion);
-    List<Empresa> findAllByNombre_comercial(String nombreComercial);
+    Optional<Empresa> findByNombreComercialAndDireccion(String nombreComercial, String direccion);
+    List<Empresa> findAllByNombreComercial(String nombreComercial);
     List<Empresa> findAllByCiudad(String ciudad);
-    List<Empresa> findAllByCodigo_postal(String codigoPostal);
+    List<Empresa> findAllByCodigoPostal(String codigoPostal);
     List<Empresa> findAllByPais(String pais);
 
-    //COUNT
-    int countAllByNombre_comercial(String nombreComercial);
+    // COUNT
+    int countAllByNombreComercial(String nombreComercial);
     int countAllByCiudad(String ciudad);
-    int countAllByCodigo_postal(String codigoPostal);
+    int countAllByCodigoPostal(String codigoPostal);
     int countAllByPais(String pais);
 
-    //EXISTS
-    boolean existsByNombre_legal(String nombreLegal);
-    boolean existsByNif_cif(String nifCif);
+    // EXISTS
+    boolean existsByNombreLegal(String nombreLegal);
+    boolean existsByNifCif(String nifCif);
     boolean existsByEmail(String email);
     boolean existsByTelefono(String telefono);
 
-    //DELETE
-    void deleteByNombre_legal(String nombreLegal);
-    void deleteByNif_cif(String nifCif);
+    // DELETE
+    void deleteByNombreLegal(String nombreLegal);
+    void deleteByNifCif(String nifCif);
     void deleteByEmail(String email);
     void deleteByTelefono(String telefono);
 }

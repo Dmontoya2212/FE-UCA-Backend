@@ -13,23 +13,25 @@ import java.util.UUID;
 public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     // Listar items de una empresa
-    List<Item> findAllByEmpresa_id(UUID empresa_id);
+    List<Item> findAllByEmpresaId(UUID empresaId);
 
     // Listar items activos
-    List<Item> findAllByEmpresa_idAndActivoTrue(UUID empresa_id);
+    List<Item> findAllByEmpresaIdAndActivoTrue(UUID empresaId);
 
     // Buscar item por nombre dentro de empresa
-    Optional<Item> findByEmpresa_idAndNombre(UUID empresa_id, String nombre);
+    Optional<Item> findByEmpresaIdAndNombre(UUID empresaId, String nombre);
 
     // Validar si existe nombre dentro de empresa
-    boolean existsByEmpresa_idAndNombre(UUID empresa_id, String nombre);
+    boolean existsByEmpresaIdAndNombre(UUID empresaId, String nombre);
 
     // Listar por categoría (ENUM)
-    List<Item> findAllByEmpresa_idAndCategoria(UUID empresa_id, ItemCategoria categoria);
+    List<Item> findAllByEmpresaIdAndCategoria(UUID empresaId, ItemCategoria categoria);
 
     // Listar por IVA
-    List<Item> findAllByEmpresa_idAndIva_id(UUID empresa_id, UUID iva_id);
+    List<Item> findAllByEmpresaIdAndIvaId(UUID empresaId, UUID ivaId);
 
     // Filtro por nombre (like)
-    List<Item> findAllByEmpresa_idAndNombreContainingIgnoreCase(UUID empresa_id, String nombre);
+    List<Item> findAllByEmpresaIdAndNombreContainingIgnoreCase(UUID empresaId, String nombre);
+
+
 }
