@@ -83,7 +83,16 @@ public class EmpresaServiceImpl implements EmpresaService {
     //READ
     @Override
     public EmpresaResponse getById(UUID id) {
-        return null;
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
+
+        List<MonedaResponse> monedas = empresaMonedaRepository
+                .findAllByEmpresa_id(id)
+                .stream()
+                .map(rel -> MonedaMapper.toDTO(rel.getMoneda()))
+                .toList();
+
+        return EmpresaMapper.toDTO(empresa, monedas);
     }
 
     @Override
