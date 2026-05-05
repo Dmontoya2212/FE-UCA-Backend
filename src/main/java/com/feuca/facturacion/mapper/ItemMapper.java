@@ -2,9 +2,13 @@ package com.feuca.facturacion.mapper;
 
 import com.feuca.facturacion.dto.request.Item.ItemRequest;
 import com.feuca.facturacion.dto.request.Item.ItemUpdateRequest;
+import com.feuca.facturacion.dto.response.Item.ItemIvaResponse;
 import com.feuca.facturacion.dto.response.Item.ItemResponse;
 import com.feuca.facturacion.entity.Item;
+import com.feuca.facturacion.entity.IvaTasa;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -38,15 +42,22 @@ public class ItemMapper {
         entity.setUpdatedAt(OffsetDateTime.now());
     }
 
-    public static ItemResponse to_response(Item entity) {
+    public static ItemResponse to_response(Item entity, IvaTasa ivaTasa) {
+        ItemIvaResponse ivaResponse = null;
+        if (ivaTasa != null) {
+            ivaResponse = ItemIvaResponse.builder()
+                    .nombre(ivaTasa.getNombre())
+                    .porcentaje(ivaTasa.getPorcentaje().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP))
+                    .build();
+        }
+
         return ItemResponse.builder()
                 .id(entity.getId())
                 .empresaId(entity.getEmpresaId())
                 .nombre(entity.getNombre())
                 .descripcion(entity.getDescripcion())
                 .categoria(entity.getCategoria())
-                .ivaId(entity.getIvaId())
-                .ivaPorcentajeSnapshot(entity.getIvaPorcentajeSnapshot())
+                .iva(ivaResponse)
                 .precioSinIva(entity.getPrecioSinIva())
                 .activo(entity.getActivo())
                 .createdAt(entity.getCreatedAt())

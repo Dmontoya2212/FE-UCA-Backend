@@ -29,11 +29,8 @@ public class ItemResponse {
     @JsonProperty("categoria")
     private ItemCategoria categoria;
 
-    @JsonProperty("iva_id")
-    private UUID ivaId;
-
-    @JsonProperty("iva_porcentaje_snapshot")
-    private BigDecimal ivaPorcentajeSnapshot;
+    @JsonProperty("iva")
+    private ItemIvaResponse iva;
 
     @JsonProperty("precio_sin_iva")
     private BigDecimal precioSinIva;

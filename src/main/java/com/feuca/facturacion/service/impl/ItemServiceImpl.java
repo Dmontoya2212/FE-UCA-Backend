@@ -49,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
         Item entity = ItemMapper.to_entity(request, empresaId);
         Item saved = itemRepository.save(entity);
 
-        return ItemMapper.to_response(saved);
+        return toResponseWithIva(saved);
     }
 
     // READ
@@ -63,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotFoundException("Item no encontrado con id: " + id);
         }
 
-        return ItemMapper.to_response(entity);
+        return toResponseWithIva(entity);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotFoundException("Item no encontrado para esa empresa con nombre: " + nombre);
         }
 
-        return ItemMapper.to_response(entity);
+        return toResponseWithIva(entity);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponse> getAllByEmpresaId(UUID empresaId) {
         return itemRepository.findAllByEmpresaId(empresaId).stream()
                 .filter(i -> i.getDeletedAt() == null)
-                .map(ItemMapper::to_response)
+                .map(this::toResponseWithIva)
                 .toList();
     }
 
@@ -94,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
         // repo devuelve activos true, pero igual filtramos deleted_at
         return itemRepository.findAllByEmpresaIdAndActivoTrue(empresaId).stream()
                 .filter(i -> i.getDeletedAt() == null)
-                .map(ItemMapper::to_response)
+                .map(this::toResponseWithIva)
                 .toList();
     }
 
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponse> getAllByEmpresaIdAndCategoria(UUID empresaId, ItemCategoria categoria) {
         return itemRepository.findAllByEmpresaIdAndCategoria(empresaId, categoria).stream()
                 .filter(i -> i.getDeletedAt() == null)
-                .map(ItemMapper::to_response)
+                .map(this::toResponseWithIva)
                 .toList();
     }
 
@@ -112,7 +112,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponse> getAllByEmpresaIdAndIvaId(UUID empresaId, UUID ivaId) {
         return itemRepository.findAllByEmpresaIdAndIvaId(empresaId, ivaId).stream()
                 .filter(i -> i.getDeletedAt() == null)
-                .map(ItemMapper::to_response)
+                .map(this::toResponseWithIva)
                 .toList();
     }
 
@@ -121,7 +121,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponse> searchByNombre(UUID empresaId, String nombre) {
         return itemRepository.findAllByEmpresaIdAndNombreContainingIgnoreCase(empresaId, nombre).stream()
                 .filter(i -> i.getDeletedAt() == null)
-                .map(ItemMapper::to_response)
+                .map(this::toResponseWithIva)
                 .toList();
     }
 
@@ -153,7 +153,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item updated = itemRepository.save(entity);
 
-        return ItemMapper.to_response(updated);
+        return toResponseWithIva(updated);
     }
 
     // DELETE
@@ -173,7 +173,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item saved = itemRepository.save(entity);
 
-        return ItemMapper.to_response(saved);
+        return toResponseWithIva(saved);
     }
 
     // HELPERS
@@ -185,4 +185,9 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemIvaNotFoundException("El IVA indicado no pertenece a esta empresa.");
         }
     }
-}
+
+    private ItemResponse toResponseWithIva(Item entity) {
+        IvaTasa ivaTasa = ivaTasaRepository.findById(entity.getIvaId()).orElse(null);
+        return ItemMapper.to_response(entity, ivaTasa);
+    }
+}
