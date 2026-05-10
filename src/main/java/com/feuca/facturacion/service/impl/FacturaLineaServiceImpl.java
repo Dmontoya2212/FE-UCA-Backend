@@ -1,6 +1,5 @@
 package com.feuca.facturacion.service.impl;
 
-import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaRequest;
 import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaUpdateRequest;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.entity.Factura;
@@ -18,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 @Service
 public class FacturaLineaServiceImpl implements FacturaLineaService {
+
     private final FacturaRepository facturaRepository;
     private final FacturaLineaRepository facturaLineaRepository;
 
-    public FacturaLineaServiceImpl(FacturaRepository facturaRepository, FacturaLineaRepository facturaLineaRepository) {
+    public FacturaLineaServiceImpl(FacturaRepository facturaRepository,
+                                   FacturaLineaRepository facturaLineaRepository) {
         this.facturaRepository = facturaRepository;
         this.facturaLineaRepository = facturaLineaRepository;
     }
@@ -40,22 +42,7 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
     }
 
     @Override
-    @Transactional
-    public FacturaLineaResponse create(UUID empresaId, FacturaLineaRequest request) {
-
-        Factura factura = getFacturaOrThrow(empresaId, request.getFacturaId());
-        validarEditable(factura);
-
-        FacturaLinea entity = FacturaLineaMapper.toEntityCreate(request);
-
-        FacturaLinea saved = facturaLineaRepository.save(entity);
-        return FacturaLineaMapper.toResponse(saved);
-    }
-
-    @Override
     public FacturaLineaResponse getById(UUID empresaId, UUID facturaId, UUID lineaId) {
-
-        // valida que la factura sea de la empresa seleccionada
         getFacturaOrThrow(empresaId, facturaId);
 
         FacturaLinea linea = facturaLineaRepository.findByIdAndFacturaId(lineaId, facturaId)
@@ -66,8 +53,6 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
 
     @Override
     public List<FacturaLineaResponse> getAllByFactura(UUID empresaId, UUID facturaId) {
-
-        // valida que la factura sea de esa empresa
         getFacturaOrThrow(empresaId, facturaId);
 
         return facturaLineaRepository.findAllByFacturaId(facturaId)
@@ -78,8 +63,8 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
 
     @Override
     @Transactional
-    public FacturaLineaResponse update(UUID empresaId, UUID facturaId, UUID lineaId, FacturaLineaUpdateRequest request) {
-
+    public FacturaLineaResponse update(UUID empresaId, UUID facturaId, UUID lineaId,
+                                       FacturaLineaUpdateRequest request) {
         Factura factura = getFacturaOrThrow(empresaId, facturaId);
         validarEditable(factura);
 
@@ -95,7 +80,6 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
     @Override
     @Transactional
     public void delete(UUID empresaId, UUID facturaId, UUID lineaId) {
-
         Factura factura = getFacturaOrThrow(empresaId, facturaId);
         validarEditable(factura);
 

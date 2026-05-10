@@ -1,10 +1,15 @@
 package com.feuca.facturacion.dto.request.Factura;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,5 +29,11 @@ public class FacturaRequest {
     @NotNull
     private LocalDate fechaEmision;
 
+    @JsonProperty("moneda_codigo")
     private String monedaCodigo;
+
+    @NotEmpty
+    @Valid
+    @JsonProperty("lineas")
+    private List<FacturaLineaRequest> lineas;
 }
