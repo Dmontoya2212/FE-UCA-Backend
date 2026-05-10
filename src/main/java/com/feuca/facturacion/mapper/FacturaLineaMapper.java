@@ -1,27 +1,11 @@
 package com.feuca.facturacion.mapper;
 
-import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaRequest;
 import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaUpdateRequest;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.entity.FacturaLinea;
 
-import java.util.UUID;
-
 public class FacturaLineaMapper {
-    private FacturaLineaMapper(){}
-
-    public static FacturaLinea toEntityCreate(FacturaLineaRequest req) {
-        return FacturaLinea.builder()
-                .id(UUID.randomUUID())
-                .facturaId(req.getFacturaId())
-                .itemId(req.getItemId())
-                .descripcion(req.getDescripcion())
-                .cantidad(req.getCantidad())
-                .precioSinIva(req.getPrecioSinIva())
-                .ivaPorcentaje(req.getIvaPorcentaje())
-
-                .build();
-    }
+    private FacturaLineaMapper() {}
 
     public static void applyUpdate(FacturaLinea e, FacturaLineaUpdateRequest req) {
         if (req.getItemId() != null) e.setItemId(req.getItemId());
