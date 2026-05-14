@@ -1,5 +1,6 @@
 package com.feuca.facturacion.entity;
 
+import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,8 +33,9 @@ public class Factura {
     @Column(name = "fecha_emision", nullable = false)
     private LocalDate fechaEmision;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private String estado;
+    private InvoiceStatus estado;
 
     @Column(name = "moneda_codigo")
     private String monedaCodigo;

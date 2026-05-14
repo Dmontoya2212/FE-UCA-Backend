@@ -2,10 +2,10 @@ package com.feuca.facturacion.service.impl;
 
 import com.feuca.facturacion.dto.request.Factura.FacturaRequest;
 import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
-import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaRequest;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
+import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import com.feuca.facturacion.exception.Factura.FacturaAlreadyExistsException;
 import com.feuca.facturacion.exception.Factura.FacturaNoEditableException;
 import com.feuca.facturacion.exception.Factura.FacturaNotFoundException;
@@ -42,16 +42,13 @@ public class FacturaServiceImpl implements FacturaService {
     @Transactional
     public FacturaResponse create(FacturaRequest request) {
 
-        // Validacion unico por empresa
         String numero = request.getNumero().trim();
         boolean exists = facturaRepository.existsByEmpresaIdAndNumero(request.getEmpresaId(), numero);
         if (exists) throw new FacturaAlreadyExistsException("Ya existe una factura con este correlativo.");
         request.setNumero(numero);
 
-
         Factura factura = FacturaMapper.toEntityCreate(request);
         Factura savedFactura = facturaRepository.save(factura);
-
 
         List<FacturaLinea> lineas = request.getLineas().stream()
                 .map(lineaReq -> FacturaMapper.toLineaEntity(lineaReq, savedFactura.getId()))
@@ -59,7 +56,6 @@ public class FacturaServiceImpl implements FacturaService {
 
         List<FacturaLinea> savedLineas = facturaLineaRepository.saveAll(lineas);
 
-        // Calcular y actualizar totales en la factura
         BigDecimal subtotalSinIva = savedLineas.stream()
                 .map(FacturaLinea::getSubtotalSinIva)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -127,7 +123,7 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
+        if (f.getEstado() != InvoiceStatus.BORRADOR) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede editar.");
         }
 
@@ -160,7 +156,7 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
+        if (f.getEstado() != InvoiceStatus.BORRADOR) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede eliminar.");
         }
 
@@ -174,12 +170,11 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
+        if (f.getEstado() != InvoiceStatus.BORRADOR) {
             throw new FacturaNoEditableException("La factura ya fue enviada.");
         }
 
-
-        f.setEstado("ENVIADA");
+        f.setEstado(InvoiceStatus.EMITIDA);
         Factura saved = facturaRepository.save(f);
 
         List<FacturaLinea> lineas = facturaLineaRepository.findAllByFacturaId(facturaId);

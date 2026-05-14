@@ -1,11 +1,13 @@
 package com.feuca.facturacion.mapper;
 
 import com.feuca.facturacion.dto.request.Factura.FacturaRequest;
+import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
 import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaRequest;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
+import com.feuca.facturacion.entity.enums.InvoiceStatus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FacturaMapper {
-    private FacturaMapper(){}
+    private FacturaMapper() {}
 
     public static Factura toEntityCreate(FacturaRequest req) {
         return Factura.builder()
@@ -23,8 +25,10 @@ public class FacturaMapper {
                 .clienteId(req.getClienteId())
                 .numero(req.getNumero())
                 .fechaEmision(req.getFechaEmision())
-                .estado("BORRADOR")
+                .estado(InvoiceStatus.BORRADOR)
                 .monedaCodigo(req.getMonedaCodigo() != null ? req.getMonedaCodigo() : "USD")
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
                 .build();
     }
 
@@ -93,8 +97,7 @@ public class FacturaMapper {
                 .build();
     }
 
-    public static void applyUpdate(Factura f,
-                                   com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest req) {
+    public static void applyUpdate(Factura f, FacturaUpdateRequest req) {
         if (req.getClienteId() != null) f.setClienteId(req.getClienteId());
         if (req.getNumero() != null) f.setNumero(req.getNumero());
         if (req.getFechaEmision() != null) f.setFechaEmision(req.getFechaEmision());
