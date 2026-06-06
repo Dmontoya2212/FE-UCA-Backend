@@ -5,6 +5,7 @@ import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
 import com.feuca.facturacion.dto.response.Moneda.MonedaResponse;
 import com.feuca.facturacion.entity.Empresa;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -12,71 +13,86 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EmpresaMapper {
-
     private EmpresaMapper() {}
 
-    public static Empresa toEntityCreate(EmpresaRequest nuevaEmpresa) {
+    public static Empresa toEntityCreate(EmpresaRequest req, PasswordEncoder encoder) {
         return Empresa.builder()
                 .id(UUID.randomUUID())
-                .nombreLegal(nuevaEmpresa.getNombreLegal())
-                .nombreComercial(nuevaEmpresa.getNombreComercial())
-                .nifCif(nuevaEmpresa.getNifCif())
-                .email(nuevaEmpresa.getEmail())
-                .telefono(nuevaEmpresa.getTelefono())
-                .direccion(nuevaEmpresa.getDireccion())
-                .ciudad(nuevaEmpresa.getCiudad())
-                .codigoPostal(nuevaEmpresa.getCodigoPostal())
-                .pais(null)
+                .razonSocial(req.getRazonSocial() != null ? req.getRazonSocial().toLowerCase().trim() : null)
+                .nombreLegal(req.getNombreLegal() != null ? req.getNombreLegal().toLowerCase().trim() : null)
+                .nombreComercial(req.getNombreComercial() != null ? req.getNombreComercial().toLowerCase().trim() : null)
+                .nit(req.getNit() != null ? req.getNit().trim() : null)
+                .registro(req.getRegistro() != null ? req.getRegistro().trim() : null)
+                .actividadEconomica(req.getActividadEconomica() != null ? req.getActividadEconomica().toLowerCase().trim() : null)
+                .sectorEmpresa(req.getSectorEmpresa() != null ? req.getSectorEmpresa().toLowerCase().trim() : null)
+                .email(req.getEmail() != null ? req.getEmail().toLowerCase().trim() : null)
+                .telefono(req.getTelefono() != null ? req.getTelefono().trim() : null)
+                .direccion(req.getDireccion() != null ? req.getDireccion().toLowerCase().trim() : null)
+                .ciudad(req.getCiudad() != null ? req.getCiudad().toLowerCase().trim() : null)
+                .codigoPostal(req.getCodigoPostal() != null ? req.getCodigoPostal().trim() : null)
+                .pais(req.getPais() != null ? req.getPais().toLowerCase().trim() : null)
+                .usuario(req.getUsuario() != null ? req.getUsuario().trim() : null)
+                .passwordHash(req.getPassword() != null ? encoder.encode(req.getPassword()) : null)
+                .clavePrimaria(req.getClavePrimaria() != null ? encoder.encode(req.getClavePrimaria()) : null)
+                .token(req.getToken())
+                .expireToken(req.getExpireToken())
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
-                .deletedAt(null)
                 .build();
     }
 
-    public static void toEntityUpdate(
-            Empresa empresa,
-            EmpresaUpdateRequest empresaUpdate
-    ) {
-        if (empresaUpdate.getNombreLegal() != null) empresa.setNombreLegal(empresaUpdate.getNombreLegal());
-        if (empresaUpdate.getNombreComercial() != null) empresa.setNombreComercial(empresaUpdate.getNombreComercial());
-        if (empresaUpdate.getNifCif() != null) empresa.setNifCif(empresaUpdate.getNifCif());
-        if (empresaUpdate.getEmail() != null) empresa.setEmail(empresaUpdate.getEmail());
-        if (empresaUpdate.getTelefono() != null) empresa.setTelefono(empresaUpdate.getTelefono());
-        if (empresaUpdate.getDireccion() != null) empresa.setDireccion(empresaUpdate.getDireccion());
-        if (empresaUpdate.getCiudad() != null) empresa.setCiudad(empresaUpdate.getCiudad());
-        if (empresaUpdate.getCodigoPostal() != null) empresa.setCodigoPostal(empresaUpdate.getCodigoPostal());
-
-        empresa.setUpdatedAt(OffsetDateTime.now());
+    public static void applyUpdate(Empresa e, EmpresaUpdateRequest req, PasswordEncoder encoder) {
+        if (req.getRazonSocial() != null) e.setRazonSocial(req.getRazonSocial().toLowerCase().trim());
+        if (req.getNombreLegal() != null) e.setNombreLegal(req.getNombreLegal().toLowerCase().trim());
+        if (req.getNombreComercial() != null) e.setNombreComercial(req.getNombreComercial().toLowerCase().trim());
+        if (req.getNit() != null) e.setNit(req.getNit().trim());
+        if (req.getRegistro() != null) e.setRegistro(req.getRegistro().trim());
+        if (req.getActividadEconomica() != null) e.setActividadEconomica(req.getActividadEconomica().toLowerCase().trim());
+        if (req.getSectorEmpresa() != null) e.setSectorEmpresa(req.getSectorEmpresa().toLowerCase().trim());
+        if (req.getEmail() != null) e.setEmail(req.getEmail().toLowerCase().trim());
+        if (req.getTelefono() != null) e.setTelefono(req.getTelefono().trim());
+        if (req.getDireccion() != null) e.setDireccion(req.getDireccion().toLowerCase().trim());
+        if (req.getCiudad() != null) e.setCiudad(req.getCiudad().toLowerCase().trim());
+        if (req.getCodigoPostal() != null) e.setCodigoPostal(req.getCodigoPostal().trim());
+        if (req.getPais() != null) e.setPais(req.getPais().toLowerCase().trim());
+        if (req.getUsuario() != null) e.setUsuario(req.getUsuario().trim());
+        if (req.getPassword() != null) e.setPasswordHash(encoder.encode(req.getPassword()));
+        if (req.getClavePrimaria() != null) e.setClavePrimaria(encoder.encode(req.getClavePrimaria()));
+        if (req.getToken() != null) e.setToken(req.getToken());
+        if (req.getExpireToken() != null) e.setExpireToken(req.getExpireToken());
+        e.setUpdatedAt(OffsetDateTime.now());
     }
 
-    public static EmpresaResponse toDTO(
-            Empresa empresa,
-            List<MonedaResponse> monedas
-    ) {
+    public static EmpresaResponse toDTO(Empresa e, List<MonedaResponse> monedas) {
         return EmpresaResponse.builder()
-                .id(empresa.getId())
-                .nombreLegal(empresa.getNombreLegal())
-                .nombreComercial(empresa.getNombreComercial())
-                .nifCif(empresa.getNifCif())
-                .email(empresa.getEmail())
-                .telefono(empresa.getTelefono())
-                .direccion(empresa.getDireccion())
-                .ciudad(empresa.getCiudad())
-                .codigoPostal(empresa.getCodigoPostal())
-                .pais(empresa.getPais())
-                .createdAt(empresa.getCreatedAt())
-                .monedas(monedas != null ? monedas : List.<MonedaResponse>of())
+                .id(e.getId())
+                .razonSocial(e.getRazonSocial())
+                .nombreLegal(e.getNombreLegal())
+                .nombreComercial(e.getNombreComercial())
+                .nit(e.getNit())
+                .registro(e.getRegistro())
+                .actividadEconomica(e.getActividadEconomica())
+                .sectorEmpresa(e.getSectorEmpresa())
+                .email(e.getEmail())
+                .telefono(e.getTelefono())
+                .direccion(e.getDireccion())
+                .ciudad(e.getCiudad())
+                .codigoPostal(e.getCodigoPostal())
+                .pais(e.getPais())
+                .usuario(e.getUsuario())
+                .token(e.getToken())
+                .expireToken(e.getExpireToken())
+                .monedas(monedas)
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
                 .build();
     }
 
-    public static List<EmpresaResponse> toDTOList(
-            List<Empresa> empresas,
-            Map<UUID, List<MonedaResponse>> monedasPorEmpresa
-    ) {
+    public static List<EmpresaResponse> toDTOList(List<Empresa> empresas, Map<UUID, List<MonedaResponse>> monedasXEmpresa) {
         return empresas.stream()
                 .map(empresa -> toDTO(
                         empresa,
-                        monedasPorEmpresa.getOrDefault(empresa.getId(), List.<MonedaResponse>of())
+                        monedasXEmpresa.getOrDefault(empresa.getId(), List.of())
                 ))
                 .toList();
     }

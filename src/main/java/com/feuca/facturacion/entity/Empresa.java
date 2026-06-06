@@ -18,19 +18,31 @@ public class Empresa {
     @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
+    @Column(name = "razon_social")
+    private String razonSocial;
+
     @Column(name = "nombre_legal")
     private String nombreLegal;
 
     @Column(name = "nombre_comercial")
     private String nombreComercial;
 
-    @Column(name = "nif_cif")
-    private String nifCif;
+    @Column(name = "nit", unique = true)
+    private String nit;
 
-    @Column(name = "email")
+    @Column(name = "registro")
+    private String registro;
+
+    @Column(name = "actividad_economica")
+    private String actividadEconomica;
+
+    @Column(name = "sector_empresa")
+    private String sectorEmpresa;
+
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "telefono")
+    @Column(name = "telefono", unique = true)
     private String telefono;
 
     @Column(name = "direccion")
@@ -44,6 +56,21 @@ public class Empresa {
 
     @Column(name = "pais")
     private String pais;
+
+    @Column(name = "usuario")
+    private String usuario;
+
+    @Column(name = "password_hash")
+    private String passwordHash;
+
+    @Column(name = "clave_primaria")
+    private String clavePrimaria;
+
+    @Column(name = "token", columnDefinition = "TEXT")
+    private String token;
+
+    @Column(name = "expire_token")
+    private String expireToken;
 
     @Column(name = "created_at")
     private OffsetDateTime createdAt;

@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface EmpresaService {
-    //CREATE
+
+    // CREATE
     EmpresaResponse create(EmpresaRequest empresa);
 
-    //READ
+    // READ
     EmpresaResponse getById(UUID id);
     EmpresaResponse getByNombreLegal(String nombreLegal);
-    EmpresaResponse getByNifCif(String nifCif);
+    EmpresaResponse getByNit(String nit);
     EmpresaResponse getByEmail(String email);
     EmpresaResponse getByTelefono(String telefono);
     EmpresaResponse getByNombreComercialAndDireccion(String nombreComercial, String direccion);
@@ -25,15 +26,14 @@ public interface EmpresaService {
     List<EmpresaResponse> getAllByPais(String pais);
     List<EmpresaResponse> getAll();
 
-
-    //UPDATE
+    // UPDATE
     EmpresaResponse update(UUID idEmpresa, EmpresaUpdateRequest empresaRequest);
     EmpresaResponse updateMonedas(UUID idEmpresa, AddMonedaRequest monedas);
 
-    //DELETE
+    // DELETE
     EmpresaResponse deleteById(UUID id);
     EmpresaResponse deleteByNombreLegal(String nombreLegal);
-    EmpresaResponse deleteByNifCif(String nifCif);
+    EmpresaResponse deleteByNit(String nit);
     EmpresaResponse deleteByEmail(String email);
     EmpresaResponse deleteByTelefono(String telefono);
 }

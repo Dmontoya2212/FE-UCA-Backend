@@ -3,12 +3,17 @@ package com.feuca.facturacion.dto.request.Empresa;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import jakarta.validation.constraints.Pattern;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class EmpresaUpdateRequest {
+
+    @JsonProperty("razon_social")
+    private String razonSocial;
+
     @JsonProperty("nombre_legal")
     @Size(max = 180, message = "El nombre legal no puede exceder 180 caracteres")
     private String nombreLegal;
@@ -17,13 +22,21 @@ public class EmpresaUpdateRequest {
     @Size(max = 180, message = "El nombre comercial no puede exceder 180 caracteres")
     private String nombreComercial;
 
-    @JsonProperty("nif_cif")
-    @Size(max = 30, message = "El NIF/CIF no puede exceder 30 caracteres")
     @Pattern(
-            regexp = "^[A-Za-z0-9-]*$",
-            message = "El NIF/CIF solo puede contener letras, números y guiones"
+            regexp = "^\\d{4}-\\d{6}-\\d{3}-\\d{1}$",
+            message = "El NIT debe tener el formato XXXX-XXXXXX-XXX-X (Ej: 0614-123456-101-1)"
     )
-    private String nifCif;
+    @JsonProperty("nit")
+    private String nit;
+
+    @JsonProperty("registro")
+    private String registro;
+
+    @JsonProperty("actividad_economica")
+    private String actividadEconomica;
+
+    @JsonProperty("sector_empresa")
+    private String sectorEmpresa;
 
     @JsonProperty("email")
     @Email(message = "Debe ser un email válido")
@@ -45,4 +58,22 @@ public class EmpresaUpdateRequest {
     @JsonProperty("codigo_postal")
     @Size(max = 20, message = "El código postal no puede exceder 20 caracteres")
     private String codigoPostal;
+
+    @JsonProperty("pais")
+    private String pais;
+
+    @JsonProperty("usuario")
+    private String usuario;
+
+    @JsonProperty("password")
+    private String password;
+
+    @JsonProperty("clave_primaria")
+    private String clavePrimaria;
+
+    @JsonProperty("token")
+    private String token;
+
+    @JsonProperty("expire_token")
+    private String expireToken;
 }

@@ -1,6 +1,5 @@
 package com.feuca.facturacion.dto.response.Empresa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.feuca.facturacion.dto.response.Moneda.MonedaResponse;
 import lombok.*;
 
@@ -13,39 +12,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class EmpresaResponse {
-    @JsonProperty("id")
+
     private UUID id;
-
-    @JsonProperty("nombre_legal")
+    private String razonSocial;
     private String nombreLegal;
-
-    @JsonProperty("nombre_comercial")
     private String nombreComercial;
-
-    @JsonProperty("nif_cif")
-    private String nifCif;
-
-    @JsonProperty("email")
+    private String nit;
+    private String registro;
+    private String actividadEconomica;
+    private String sectorEmpresa;
     private String email;
-
-    @JsonProperty("telefono")
     private String telefono;
-
-    @JsonProperty("direccion")
     private String direccion;
-
-    @JsonProperty("ciudad")
     private String ciudad;
-
-    @JsonProperty("codigo_postal")
     private String codigoPostal;
-
-    @JsonProperty("pais")
     private String pais;
-
-    @JsonProperty("created_at")
-    private OffsetDateTime createdAt;
-
-    @JsonProperty("monedas")
+    private String usuario;
+    private String token;
+    private String expireToken;
     private List<MonedaResponse> monedas;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }

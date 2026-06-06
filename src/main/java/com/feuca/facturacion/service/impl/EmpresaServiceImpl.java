@@ -17,6 +17,7 @@ import com.feuca.facturacion.repository.EmpresaMonedaRepository;
 import com.feuca.facturacion.repository.MonedaRepository;
 import com.feuca.facturacion.service.EmpresaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +30,19 @@ public class EmpresaServiceImpl implements EmpresaService {
     private final EmpresaRepository empresaRepository;
     private final EmpresaMonedaRepository empresaMonedaRepository;
     private final MonedaRepository monedaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmpresaServiceImpl (
+    public EmpresaServiceImpl(
         EmpresaRepository empresaRepository,
         EmpresaMonedaRepository empresaMonedaRepository,
-        MonedaRepository monedaRepository
-    ){
+        MonedaRepository monedaRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.empresaRepository = empresaRepository;
         this.empresaMonedaRepository = empresaMonedaRepository;
         this.monedaRepository = monedaRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     //CREATE
@@ -47,35 +51,32 @@ public class EmpresaServiceImpl implements EmpresaService {
     public EmpresaResponse create(EmpresaRequest empresa) {
 
         String nombreEmpresaNormalizado = empresa.getNombreLegal().toLowerCase().trim();
-        String nifCifNormalizado = empresa.getNifCif().toLowerCase().trim();
-        String correoNormalizado = empresa.getEmail().trim();
-        String telefonoNormalizado = empresa.getTelefono().trim();
+        String nifCifNormalizado = empresa.getNit().trim();
+        String correoNormalizado = empresa.getEmail() != null ? empresa.getEmail().trim() : null;
+        String telefonoNormalizado = empresa.getTelefono() != null ? empresa.getTelefono().trim() : null;
 
         boolean existeNombreLegal = empresaRepository.existsByNombreLegal(nombreEmpresaNormalizado);
-        boolean existeNifCif = empresaRepository.existsByNifCif(nifCifNormalizado);
-        boolean existeEmail = empresaRepository.existsByEmail(correoNormalizado);
-        boolean existeTelefono = empresaRepository.existsByTelefono(telefonoNormalizado);
+        boolean existeNifCif = empresaRepository.existsByNit(nifCifNormalizado);
 
-        if(existeNombreLegal) throw new EmpresaAlredyExistsException("El nombre \"" + empresa.getNombreLegal() + "\" ya ha sido asignado a una empresa.");
-        if(existeNifCif) throw new EmpresaNifCifAlredyExistsException("El NIT \"" + empresa.getNifCif() + "\" ya ha sido asignado a una empresa.");
-        if(existeEmail) throw  new EmpresaEmailAlredyExistsException("El email \"" + empresa.getEmail() + "\" ya ha sido asignado a una empresa.");
-        if(existeTelefono) throw new EmpresaTelefonoAlredyExistsException("El numero telefonico \"" + empresa.getTelefono() + "\" ya ha sido asignado a una empresa.");
+        if (existeNombreLegal) throw new EmpresaAlredyExistsException("El nombre \"" + empresa.getNombreLegal() + "\" ya ha sido asignado a una empresa.");
+        if (existeNifCif) throw new EmpresaNifCifAlredyExistsException("El NIT \"" + empresa.getNit() + "\" ya ha sido asignado a una empresa.");
 
-        EmpresaRequest empresaNormalizada = EmpresaRequest.builder()
-                .nombreLegal(nombreEmpresaNormalizado)
-                .nombreComercial(empresa.getNombreComercial().toLowerCase().trim())
-                .nifCif(nifCifNormalizado)
-                .email(correoNormalizado)
-                .telefono(telefonoNormalizado)
-                .direccion(empresa.getDireccion().toLowerCase().trim())
-                .ciudad(empresa.getCiudad().toLowerCase().trim())
-                .codigoPostal(empresa.getCodigoPostal().toLowerCase().trim())
-                .build();
+        if (correoNormalizado != null) {
+            boolean existeEmail = empresaRepository.existsByEmail(correoNormalizado);
+            if (existeEmail) throw new EmpresaEmailAlredyExistsException("El email \"" + empresa.getEmail() + "\" ya ha sido asignado a una empresa.");
+        }
+
+        if (telefonoNormalizado != null) {
+            boolean existeTelefono = empresaRepository.existsByTelefono(telefonoNormalizado);
+            if (existeTelefono) throw new EmpresaTelefonoAlredyExistsException("El numero telefonico \"" + empresa.getTelefono() + "\" ya ha sido asignado a una empresa.");
+        }
+
+        Empresa nuevaEmpresa = EmpresaMapper.toEntityCreate(empresa, passwordEncoder);
 
         List<MonedaResponse> monedas = List.of();
 
         return EmpresaMapper.toDTO(
-                empresaRepository.save(EmpresaMapper.toEntityCreate(empresaNormalizada)),
+                empresaRepository.save(nuevaEmpresa),
                 monedas
         );
     }
@@ -113,11 +114,11 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public EmpresaResponse getByNifCif(String nifCif) {
+    public EmpresaResponse getByNit(String nit) {
 
-        String nifCifNormalizado = nifCif.toLowerCase().trim();
+        String nitNormalizado = nit.trim();
 
-        Empresa empresa = empresaRepository.findByNifCif(nifCifNormalizado)
+        Empresa empresa = empresaRepository.findByNit(nitNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository
@@ -203,7 +204,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                 .collect(Collectors.groupingBy(
                         EmpresaMoneda::getEmpresa_id,
                         Collectors.mapping(
-                                    rel -> MonedaMapper.toDTO(rel.getMoneda()),
+                                rel -> MonedaMapper.toDTO(rel.getMoneda()),
                                 Collectors.toList()
                         )
                 ));
@@ -334,43 +335,13 @@ public class EmpresaServiceImpl implements EmpresaService {
         Empresa empresa = empresaRepository.findById(idEmpresa)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
-        String nombreLegalNormalizado  = null,
-                nombreComercialNormalizado  = null,
-                nifCifNormalizado  = null,
-                emailNormalizado  = null,
-                telefonoNormalizado  = null,
-                direccionNormalizada  = null,
-                ciudadNormalizada  = null,
-                codigoPostalNormalizado = null;
-
-        if(empresaRequest.getNombreLegal() != null) nombreLegalNormalizado = empresaRequest.getNombreLegal().toLowerCase().trim();
-        if(empresaRequest.getNombreComercial() != null) nombreComercialNormalizado = empresaRequest.getNombreComercial().toLowerCase().trim();
-        if(empresaRequest.getNifCif() != null) nifCifNormalizado = empresaRequest.getNifCif().toLowerCase().trim();
-        if(empresaRequest.getEmail() != null) emailNormalizado = empresaRequest.getEmail().trim();
-        if(empresaRequest.getTelefono() != null) telefonoNormalizado = empresaRequest.getTelefono().trim();
-        if(empresaRequest.getDireccion() != null) direccionNormalizada = empresaRequest.getDireccion().toLowerCase().trim();
-        if(empresaRequest.getCiudad() != null) ciudadNormalizada = empresaRequest.getCiudad().toLowerCase().trim();
-        if(empresaRequest.getCodigoPostal() != null) codigoPostalNormalizado = empresaRequest.getCodigoPostal().toLowerCase().trim();
-
-
-        EmpresaUpdateRequest empresaUpdateNormalizada = EmpresaUpdateRequest.builder()
-                .nombreLegal(nombreLegalNormalizado)
-                .nombreComercial(nombreComercialNormalizado)
-                .nifCif(nifCifNormalizado)
-                .email(emailNormalizado)
-                .telefono(telefonoNormalizado)
-                .direccion(direccionNormalizada)
-                .ciudad(ciudadNormalizada)
-                .codigoPostal(codigoPostalNormalizado)
-                .build();
+        EmpresaMapper.applyUpdate(empresa, empresaRequest, passwordEncoder);
 
         List<MonedaResponse> monedas = empresaMonedaRepository
                 .findAllByEmpresa_id(empresa.getId())
                 .stream()
                 .map(rel -> MonedaMapper.toDTO(rel.getMoneda()))
                 .toList();
-
-        EmpresaMapper.toEntityUpdate(empresa, empresaUpdateNormalizada);
 
         return EmpresaMapper.toDTO(empresaRepository.save(empresa), monedas);
     }
@@ -388,24 +359,24 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         Set<String> codigos = new HashSet<>(monedasRequest.getCodigos());
 
-        List<Moneda> monedas =  monedaRepository.findAllById(codigos);
+        List<Moneda> monedas = monedaRepository.findAllById(codigos);
 
-        if(monedas.size() != monedasRequest.getCodigos().size())
+        if (monedas.size() != monedasRequest.getCodigos().size())
             throw new MonedaNotFoundException("Una o mas monedas no existen.");
 
         List<EmpresaMoneda> relExistentes = empresaMonedaRepository.findAllByEmpresa_id(idEmpresa);
 
         Set<String> codigosExistentes = relExistentes.stream()
-                        .map(EmpresaMoneda::getMoneda_codigo)
-                        .collect(Collectors.toSet());
+                .map(EmpresaMoneda::getMoneda_codigo)
+                .collect(Collectors.toSet());
 
         List<EmpresaMoneda> relNuevas = monedas.stream()
-                        .filter(moneda -> !codigosExistentes.contains(moneda.getCodigo()))
-                        .map(moneda -> EmpresaMoneda.builder()
-                                .empresa_id(idEmpresa)
-                                .moneda_codigo(moneda.getCodigo())
-                                .build())
-                        .toList();
+                .filter(moneda -> !codigosExistentes.contains(moneda.getCodigo()))
+                .map(moneda -> EmpresaMoneda.builder()
+                        .empresa_id(idEmpresa)
+                        .moneda_codigo(moneda.getCodigo())
+                        .build())
+                .toList();
 
         if (!relNuevas.isEmpty()) {
             empresaMonedaRepository.saveAll(relNuevas);
@@ -459,11 +430,11 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public EmpresaResponse deleteByNifCif(String nifCif) {
+    public EmpresaResponse deleteByNit(String nit) {
 
-        String nifCifNormalizado = nifCif.toLowerCase().trim();
+        String nitNormalizado = nit.trim();
 
-        Empresa empresa = empresaRepository.findByNifCif(nifCifNormalizado)
+        Empresa empresa = empresaRepository.findByNit(nitNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
 
         List<MonedaResponse> monedas = empresaMonedaRepository
@@ -499,7 +470,7 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     public EmpresaResponse deleteByTelefono(String telefono) {
 
-        String telefonoNormalizado = telefono.toLowerCase().trim();
+        String telefonoNormalizado = telefono.trim();
 
         Empresa empresa = empresaRepository.findByTelefono(telefonoNormalizado)
                 .orElseThrow(() -> new EmpresaNotFoundException("Empresa no encontrada"));
@@ -515,3 +486,4 @@ public class EmpresaServiceImpl implements EmpresaService {
         return EmpresaMapper.toDTO(empresa, monedas);
     }
 }
+

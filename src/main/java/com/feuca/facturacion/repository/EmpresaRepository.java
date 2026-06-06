@@ -13,7 +13,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
 
     // READ
     Optional<Empresa> findByNombreLegal(String nombreLegal);
-    Optional<Empresa> findByNifCif(String nifCif);
+    Optional<Empresa> findByNit(String nit);
     Optional<Empresa> findByEmail(String email);
     Optional<Empresa> findByTelefono(String telefono);
     Optional<Empresa> findByNombreComercialAndDireccion(String nombreComercial, String direccion);
@@ -30,13 +30,13 @@ public interface EmpresaRepository extends JpaRepository<Empresa, UUID> {
 
     // EXISTS
     boolean existsByNombreLegal(String nombreLegal);
-    boolean existsByNifCif(String nifCif);
+    boolean existsByNit(String nit);
     boolean existsByEmail(String email);
     boolean existsByTelefono(String telefono);
 
     // DELETE
     void deleteByNombreLegal(String nombreLegal);
-    void deleteByNifCif(String nifCif);
+    void deleteByNit(String nit);
     void deleteByEmail(String email);
     void deleteByTelefono(String telefono);
 }

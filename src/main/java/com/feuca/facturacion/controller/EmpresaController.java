@@ -62,9 +62,9 @@ public class EmpresaController {
         );
     }
 
-    @GetMapping("/nit/{nifcif}")
-    public ResponseEntity<GeneralResponse> getByNifcif(@PathVariable String nifcif) {
-        EmpresaResponse empresa = empresaService.getByNifCif(nifcif);
+    @GetMapping("/nit/{nit}")
+    public ResponseEntity<GeneralResponse> getByNit(@PathVariable String nit) {
+        EmpresaResponse empresa = empresaService.getByNit(nit);
 
         return ResponseBuilder.buildResponse(
                 "Empresa encontrada.",
@@ -231,11 +231,11 @@ public class EmpresaController {
         );
     }
 
-    @DeleteMapping("/nit/{nifcif}")
-    public ResponseEntity<GeneralResponse> deleteByNifci(
-            @PathVariable String nifcif
+    @DeleteMapping("/nit/{nit}")
+    public ResponseEntity<GeneralResponse> deleteByNit(
+            @PathVariable String nit
     ) {
-        EmpresaResponse empresa = empresaService.deleteByNifCif(nifcif);
+        EmpresaResponse empresa = empresaService.deleteByNit(nit);
 
         return ResponseBuilder.buildResponse(
                 "Empresa eliminada.",
