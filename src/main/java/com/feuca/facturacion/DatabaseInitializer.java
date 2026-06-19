@@ -302,6 +302,88 @@ public class DatabaseInitializer implements CommandLineRunner {
                             );
                         } catch (Exception ex) {}
                     }
+
+                    // SEED FACTURAS (Ejemplos)
+                    Integer facturasCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM facturas WHERE numero = 'F-000001'", Integer.class);
+                    if (facturasCount != null && facturasCount == 0) {
+                        System.out.println("Sembrando 3 facturas de prueba...");
+                        
+                        UUID clienteId = null;
+                        String clienteNombre = "Industrias La Constancia S.A. de C.V.";
+                        String clienteNif = "0614-250912-101-1";
+                        String clienteDir = "Paseo General Escalón, San Salvador";
+                        try {
+                            java.util.List<java.util.Map<String, Object>> clientsList = jdbcTemplate.queryForList(
+                                "SELECT id, nombre_razon_social, nif_cif, direccion FROM clientes WHERE empresa_id = ? LIMIT 1",
+                                firstEmpresaId
+                            );
+                            if (!clientsList.isEmpty()) {
+                                java.util.Map<String, Object> cliMap = clientsList.get(0);
+                                clienteId = (UUID) cliMap.get("id");
+                                clienteNombre = (String) cliMap.get("nombre_razon_social");
+                                clienteNif = (String) cliMap.get("nif_cif");
+                                clienteDir = (String) cliMap.get("direccion");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("No se pudo obtener cliente para facturas: " + e.getMessage());
+                        }
+
+                        // Factura 1: Emitida
+                        UUID fact1Id = UUID.randomUUID();
+                        jdbcTemplate.update(
+                            "INSERT INTO facturas (id, empresa_id, cliente_id, numero, fecha_emision, estado, moneda_codigo, " +
+                            "subtotal_sin_iva, total_iva, total_con_iva, cliente_nombre_razon_social, cliente_nif_cif, cliente_direccion, created_at, updated_at) " +
+                            "VALUES (?, ?, ?, ?, '2026-06-18', 'EMITIDA', 'USD', ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                            fact1Id,
+                            firstEmpresaId,
+                            clienteId,
+                            "F-000001",
+                            new java.math.BigDecimal("1200.00"),
+                            new java.math.BigDecimal("156.00"),
+                            new java.math.BigDecimal("1356.00"),
+                            clienteNombre,
+                            clienteNif,
+                            clienteDir
+                        );
+
+                        // Factura 2: Pagada
+                        UUID fact2Id = UUID.randomUUID();
+                        jdbcTemplate.update(
+                            "INSERT INTO facturas (id, empresa_id, cliente_id, numero, fecha_emision, estado, moneda_codigo, " +
+                            "subtotal_sin_iva, total_iva, total_con_iva, cliente_nombre_razon_social, cliente_nif_cif, cliente_direccion, created_at, updated_at) " +
+                            "VALUES (?, ?, ?, ?, '2026-06-15', 'PAGADA', 'USD', ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                            fact2Id,
+                            firstEmpresaId,
+                            clienteId,
+                            "F-000002",
+                            new java.math.BigDecimal("450.00"),
+                            new java.math.BigDecimal("58.50"),
+                            new java.math.BigDecimal("508.50"),
+                            clienteNombre,
+                            clienteNif,
+                            clienteDir
+                        );
+
+                        // Factura 3: Borrador
+                        UUID fact3Id = UUID.randomUUID();
+                        jdbcTemplate.update(
+                            "INSERT INTO facturas (id, empresa_id, cliente_id, numero, fecha_emision, estado, moneda_codigo, " +
+                            "subtotal_sin_iva, total_iva, total_con_iva, cliente_nombre_razon_social, cliente_nif_cif, cliente_direccion, created_at, updated_at) " +
+                            "VALUES (?, ?, ?, ?, '2026-06-10', 'BORRADOR', 'USD', ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                            fact3Id,
+                            firstEmpresaId,
+                            clienteId,
+                            "F-000003",
+                            new java.math.BigDecimal("170.00"),
+                            new java.math.BigDecimal("22.10"),
+                            new java.math.BigDecimal("192.10"),
+                            clienteNombre,
+                            clienteNif,
+                            clienteDir
+                        );
+                        
+                        System.out.println("Facturas de prueba sembradas exitosamente.");
+                    }
                 } catch (Exception e) {
                     System.out.println("No se pudo sembrar items: " + e.getMessage());
                     String details = e.getMessage();
