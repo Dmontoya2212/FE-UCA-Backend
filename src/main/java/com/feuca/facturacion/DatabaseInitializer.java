@@ -46,6 +46,65 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             System.out.println("Migraciones de columnas de empresas realizadas.");
 
+            // Migración para facturas y factura_lineas
+            System.out.println("Running database migration for facturas and factura_lineas...");
+            try {
+                jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS facturas (" +
+                    "id UUID PRIMARY KEY," +
+                    "empresa_id UUID NOT NULL," +
+                    "cliente_id UUID," +
+                    "numero VARCHAR(255) NOT NULL," +
+                    "fecha_emision DATE NOT NULL," +
+                    "estado VARCHAR(50) NOT NULL," +
+                    "moneda_codigo VARCHAR(10)," +
+                    "subtotal_sin_iva NUMERIC(19, 2)," +
+                    "total_iva NUMERIC(19, 2)," +
+                    "total_con_iva NUMERIC(19, 2)," +
+                    "created_at TIMESTAMP WITH TIME ZONE," +
+                    "updated_at TIMESTAMP WITH TIME ZONE" +
+                    ")");
+            } catch (Exception e) {
+                System.out.println("No se pudo crear tabla facturas: " + e.getMessage());
+            }
+
+            try {
+                jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS factura_lineas (" +
+                    "id UUID PRIMARY KEY," +
+                    "factura_id UUID NOT NULL," +
+                    "item_id UUID," +
+                    "descripcion VARCHAR(220) NOT NULL," +
+                    "cantidad NUMERIC(12, 2) NOT NULL," +
+                    "precio_sin_iva NUMERIC(18, 8) NOT NULL," +
+                    "iva_porcentaje NUMERIC(5, 2) NOT NULL," +
+                    "subtotal_sin_iva NUMERIC(18, 8) NOT NULL," +
+                    "total_iva NUMERIC(18, 8) NOT NULL," +
+                    "total_con_iva NUMERIC(18, 8) NOT NULL," +
+                    "created_at TIMESTAMP WITH TIME ZONE," +
+                    "updated_at TIMESTAMP WITH TIME ZONE" +
+                    ")");
+            } catch (Exception e) {
+                System.out.println("No se pudo crear tabla factura_lineas: " + e.getMessage());
+            }
+
+            // Asegurar que las columnas existan si la tabla ya existía
+            try {
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS estado VARCHAR(50)");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS moneda_codigo VARCHAR(10)");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS subtotal_sin_iva NUMERIC(19, 2)");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS total_iva NUMERIC(19, 2)");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS total_con_iva NUMERIC(19, 2)");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE");
+                jdbcTemplate.execute("ALTER TABLE facturas ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE");
+
+                jdbcTemplate.execute("ALTER TABLE factura_lineas ADD COLUMN IF NOT EXISTS subtotal_sin_iva NUMERIC(18, 8)");
+                jdbcTemplate.execute("ALTER TABLE factura_lineas ADD COLUMN IF NOT EXISTS total_iva NUMERIC(18, 8)");
+                jdbcTemplate.execute("ALTER TABLE factura_lineas ADD COLUMN IF NOT EXISTS total_con_iva NUMERIC(18, 8)");
+                jdbcTemplate.execute("ALTER TABLE factura_lineas ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE");
+                jdbcTemplate.execute("ALTER TABLE factura_lineas ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE");
+            } catch (Exception e) {
+                System.out.println("Error al alterar columnas de facturas/factura_lineas: " + e.getMessage());
+            }
+
             // SEED 3 NEW COMPANIES
             System.out.println("Sembrando 3 nuevas empresas de prueba...");
             
