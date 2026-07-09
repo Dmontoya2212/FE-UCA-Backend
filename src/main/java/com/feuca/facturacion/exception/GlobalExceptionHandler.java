@@ -131,6 +131,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentialsException(InvalidCredentialsException e) {
+        return buildErrorResponse(e, HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
     // Excepciones Factura
 
     @ExceptionHandler(FacturaNotFoundException.class)

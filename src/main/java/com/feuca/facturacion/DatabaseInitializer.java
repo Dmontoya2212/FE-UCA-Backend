@@ -9,9 +9,11 @@ import java.util.UUID;
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final JdbcTemplate jdbcTemplate;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public DatabaseInitializer(JdbcTemplate jdbcTemplate) {
+    public DatabaseInitializer(JdbcTemplate jdbcTemplate, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -400,6 +402,107 @@ public class DatabaseInitializer implements CommandLineRunner {
                         );
                     } catch (Exception ex) {}
                 }
+            }
+
+            // MIGRACIÓN Y SEMBRADO DE USUARIOS DE PRUEBA
+            System.out.println("Creando tabla usuarios si no existe...");
+            try {
+                jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS usuarios (" +
+                    "id UUID PRIMARY KEY," +
+                    "empresa_id UUID NOT NULL," +
+                    "nombre VARCHAR(255) NOT NULL," +
+                    "email VARCHAR(255) NOT NULL UNIQUE," +
+                    "password_hash VARCHAR(255) NOT NULL," +
+                    "es_admin BOOLEAN NOT NULL," +
+                    "activo BOOLEAN NOT NULL," +
+                    "created_at TIMESTAMP WITH TIME ZONE," +
+                    "updated_at TIMESTAMP WITH TIME ZONE" +
+                    ")");
+            } catch (Exception e) {
+                System.out.println("No se pudo crear tabla usuarios: " + e.getMessage());
+            }
+
+            System.out.println("Sembrando usuarios de prueba...");
+            try {
+                // Buscar UUID reales de las empresas para evitar violaciones de clave foránea
+                UUID selectosId = UUID.fromString("2a1a1661-d7a8-4e89-8d1b-85cf7510d9fa");
+                try {
+                    String idStr = jdbcTemplate.queryForObject(
+                        "SELECT CAST(id AS VARCHAR) FROM empresas WHERE nit = ?",
+                        String.class,
+                        "0614-120392-101-4"
+                    );
+                    if (idStr != null) {
+                        selectosId = UUID.fromString(idStr);
+                    }
+                } catch (Exception e) {
+                    // Ignorar y usar fallback por defecto
+                }
+
+                UUID tigoId = UUID.fromString("3b2b2772-e8b9-5f9a-9e2c-96df8621e0fb");
+                try {
+                    String idStr = jdbcTemplate.queryForObject(
+                        "SELECT CAST(id AS VARCHAR) FROM empresas WHERE nit = ?",
+                        String.class,
+                        "0614-250888-102-5"
+                    );
+                    if (idStr != null) {
+                        tigoId = UUID.fromString(idStr);
+                    }
+                } catch (Exception e) {
+                    // Ignorar y usar fallback por defecto
+                }
+
+                // Admin Super Selectos
+                Integer countSelectos = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM usuarios WHERE email = ?",
+                    Integer.class,
+                    "admin@selectos.com"
+                );
+                if (countSelectos == null || countSelectos == 0) {
+                    jdbcTemplate.update(
+                        "INSERT INTO usuarios (id, empresa_id, nombre, email, password_hash, es_admin, activo, created_at, updated_at) " +
+                        "VALUES (?, ?, ?, ?, ?, true, true, NOW(), NOW())",
+                        UUID.fromString("1f2e3d4c-5b6a-7f8e-9d0c-1b2a3f4e5a6b"),
+                        selectosId,
+                        "Administrador Selectos",
+                        "admin@selectos.com",
+                        passwordEncoder.encode("UcaFactura2026.")
+                    );
+                } else {
+                    jdbcTemplate.update(
+                        "UPDATE usuarios SET password_hash = ? WHERE email = ?",
+                        passwordEncoder.encode("UcaFactura2026."),
+                        "admin@selectos.com"
+                    );
+                }
+
+                // Admin Tigo El Salvador
+                Integer countTigo = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM usuarios WHERE email = ?",
+                    Integer.class,
+                    "admin@tigo.com"
+                );
+                if (countTigo == null || countTigo == 0) {
+                    jdbcTemplate.update(
+                        "INSERT INTO usuarios (id, empresa_id, nombre, email, password_hash, es_admin, activo, created_at, updated_at) " +
+                        "VALUES (?, ?, ?, ?, ?, true, true, NOW(), NOW())",
+                        UUID.fromString("2f3e4d5c-6b7a-8f9e-0d1c-2b3a4f5e6a7b"),
+                        tigoId,
+                        "Administrador Tigo",
+                        "admin@tigo.com",
+                        passwordEncoder.encode("UcaFactura2026.")
+                    );
+                } else {
+                    jdbcTemplate.update(
+                        "UPDATE usuarios SET password_hash = ? WHERE email = ?",
+                        passwordEncoder.encode("UcaFactura2026."),
+                        "admin@tigo.com"
+                    );
+                }
+                System.out.println("Usuarios de prueba sembrados exitosamente.");
+            } catch (Exception e) {
+                System.out.println("No se pudo sembrar usuarios: " + e.getMessage());
             }
 
             System.out.println("==================================================");
