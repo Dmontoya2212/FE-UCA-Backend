@@ -12,6 +12,7 @@ public class GeneralResponse {
     private String uri;
     private String message;
     private int status;
+    @Builder.Default
     private LocalDate date = LocalDate.now();
     private Object data;
 }

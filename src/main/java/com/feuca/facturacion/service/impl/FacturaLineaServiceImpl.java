@@ -15,6 +15,9 @@ import com.feuca.facturacion.service.FacturaLineaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +44,25 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
         if (f.getEstado() != InvoiceStatus.BORRADOR) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede actualizar.");
         }
+    }
+
+    private void recalcularTotalesFactura(Factura factura) {
+        List<FacturaLinea> lineas = facturaLineaRepository.findAllByFacturaId(factura.getId());
+
+        BigDecimal subtotalSinIva = lineas.stream()
+                .map(FacturaLinea::getSubtotalSinIva)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalIva = lineas.stream()
+                .map(FacturaLinea::getTotalIva)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        factura.setSubtotalSinIva(subtotalSinIva);
+        factura.setTotalIva(totalIva);
+        factura.setTotalConIva(subtotalSinIva.add(totalIva).setScale(2, RoundingMode.HALF_UP));
+        factura.setUpdatedAt(OffsetDateTime.now());
+        facturaRepository.save(factura);
     }
 
     @Override
@@ -75,6 +97,7 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
 
         FacturaLineaMapper.applyUpdate(linea, request);
         FacturaLinea saved = facturaLineaRepository.save(linea);
+        recalcularTotalesFactura(factura);
 
         return FacturaLineaMapper.toResponse(saved);
     }
@@ -89,5 +112,7 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
                 .orElseThrow(() -> new FacturaLineaNotFoundException("Detalle no encontrado."));
 
         facturaLineaRepository.delete(linea);
+        facturaLineaRepository.flush();
+        recalcularTotalesFactura(factura);
     }
 }

@@ -3,6 +3,8 @@ package com.feuca.facturacion.entity;
 import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,8 +35,12 @@ public class Factura {
     @Column(name = "fecha_emision", nullable = false)
     private LocalDate fechaEmision;
 
+    @Column(name = "fecha_vencimiento", nullable = false)
+    private LocalDate fechaVencimiento;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "estado", nullable = false, columnDefinition = "invoice_status")
     private InvoiceStatus estado;
 
     @Column(name = "moneda_codigo")

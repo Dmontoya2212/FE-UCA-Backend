@@ -3,6 +3,7 @@ package com.feuca.facturacion.service.impl;
 import com.feuca.facturacion.dto.request.Factura.FacturaRequest;
 import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
+import com.feuca.facturacion.entity.Cliente;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
 import com.feuca.facturacion.entity.enums.InvoiceStatus;
@@ -48,6 +49,29 @@ public class FacturaServiceImpl implements FacturaService {
         request.setNumero(numero);
 
         Factura factura = FacturaMapper.toEntityCreate(request);
+
+        BigDecimal subtotalSinIva = request.getLineas().stream()
+                .map(l -> l.getPrecioSinIva().multiply(l.getCantidad()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal totalIva = request.getLineas().stream()
+                .map(l -> {
+                    BigDecimal subtotalLinea = l.getPrecioSinIva().multiply(l.getCantidad());
+                    return subtotalLinea
+                            .multiply(l.getIvaPorcentaje())
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal totalConIva = subtotalSinIva.add(totalIva)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        factura.setSubtotalSinIva(subtotalSinIva);
+        factura.setTotalIva(totalIva);
+        factura.setTotalConIva(totalConIva);
+
         Factura savedFactura = facturaRepository.save(factura);
 
         List<FacturaLinea> lineas = request.getLineas().stream()
@@ -56,27 +80,10 @@ public class FacturaServiceImpl implements FacturaService {
 
         List<FacturaLinea> savedLineas = facturaLineaRepository.saveAll(lineas);
 
-        BigDecimal subtotalSinIva = savedLineas.stream()
-                .map(FacturaLinea::getSubtotalSinIva)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
-
-        BigDecimal totalIva = savedLineas.stream()
-                .map(FacturaLinea::getTotalIva)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
-
-        BigDecimal totalConIva = subtotalSinIva.add(totalIva).setScale(2, RoundingMode.HALF_UP);
-
-        savedFactura.setSubtotalSinIva(subtotalSinIva);
-        savedFactura.setTotalIva(totalIva);
-        savedFactura.setTotalConIva(totalConIva);
-        facturaRepository.save(savedFactura);
-
         String clienteNombre = null;
         if (savedFactura.getClienteId() != null) {
             clienteNombre = clienteRepository.findById(savedFactura.getClienteId())
-                    .map(c -> c.getNombreRazonSocial())
+                    .map(Cliente::getNombreRazonSocial)
                     .orElse(null);
         }
 

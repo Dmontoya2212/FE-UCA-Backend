@@ -25,6 +25,7 @@ public class FacturaMapper {
                 .clienteId(req.getClienteId())
                 .numero(req.getNumero())
                 .fechaEmision(req.getFechaEmision())
+                .fechaVencimiento(req.getFechaEmision().plusDays(30))
                 .estado(InvoiceStatus.BORRADOR)
                 .monedaCodigo(req.getMonedaCodigo() != null ? req.getMonedaCodigo() : "USD")
                 .createdAt(OffsetDateTime.now())
@@ -69,6 +70,7 @@ public class FacturaMapper {
                 .clienteNombre(clienteNombre)
                 .numero(f.getNumero())
                 .fechaEmision(f.getFechaEmision())
+                .fechaVencimiento(f.getFechaVencimiento())
                 .estado(f.getEstado())
                 .monedaCodigo(f.getMonedaCodigo())
                 .subtotalSinIva(f.getSubtotalSinIva())
@@ -100,7 +102,10 @@ public class FacturaMapper {
     public static void applyUpdate(Factura f, FacturaUpdateRequest req) {
         if (req.getClienteId() != null) f.setClienteId(req.getClienteId());
         if (req.getNumero() != null) f.setNumero(req.getNumero());
-        if (req.getFechaEmision() != null) f.setFechaEmision(req.getFechaEmision());
+        if (req.getFechaEmision() != null) {
+            f.setFechaEmision(req.getFechaEmision());
+            f.setFechaVencimiento(req.getFechaEmision().plusDays(30));
+        }
         if (req.getMonedaCodigo() != null) f.setMonedaCodigo(req.getMonedaCodigo());
         f.setUpdatedAt(OffsetDateTime.now());
     }

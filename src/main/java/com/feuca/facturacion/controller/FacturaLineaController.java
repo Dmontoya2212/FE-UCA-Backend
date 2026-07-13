@@ -5,6 +5,7 @@ import com.feuca.facturacion.dto.response.GeneralResponse;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.service.FacturaLineaService;
 import com.feuca.facturacion.util.ResponseBuilder;
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,7 @@ public class FacturaLineaController {
             @PathVariable UUID id,
             @RequestParam UUID empresaId,
             @RequestParam UUID facturaId,
-            @RequestBody FacturaLineaUpdateRequest request
+            @RequestBody @Valid FacturaLineaUpdateRequest request
     ) {
         FacturaLineaResponse linea = facturaLineaService.update(empresaId, facturaId, id, request);
         return ResponseBuilder.buildResponse("Detalle actualizado.", HttpStatus.OK, linea);

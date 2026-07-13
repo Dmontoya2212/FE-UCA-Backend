@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Builder
 public class ApiErrorResponse {
     private int status;
+    @Builder.Default
     private LocalDate date = LocalDate.now();
     private String uri;
     private Object data;

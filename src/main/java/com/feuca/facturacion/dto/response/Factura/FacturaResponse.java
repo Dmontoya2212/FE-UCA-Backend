@@ -22,6 +22,7 @@ public class FacturaResponse {
     private String clienteNombre;
     private String numero;
     private LocalDate fechaEmision;
+    private LocalDate fechaVencimiento;
     private InvoiceStatus estado;
     private String monedaCodigo;
     private BigDecimal subtotalSinIva;
