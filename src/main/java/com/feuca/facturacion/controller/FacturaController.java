@@ -4,6 +4,8 @@ import com.feuca.facturacion.dto.request.Factura.FacturaRequest;
 import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
 import com.feuca.facturacion.dto.response.GeneralResponse;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
+import com.feuca.facturacion.dto.dte.DteFacturaElectronica;
+import com.feuca.facturacion.service.DteService;
 import com.feuca.facturacion.service.FacturaService;
 import com.feuca.facturacion.util.ResponseBuilder;
 import jakarta.validation.Valid;
@@ -17,9 +19,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/facturacion/factura")
 public class FacturaController {
     private final FacturaService facturaService;
+    private final DteService dteService;
 
-    public FacturaController(FacturaService facturaService) {
+    public FacturaController(FacturaService facturaService, DteService dteService) {
         this.facturaService = facturaService;
+        this.dteService = dteService;
     }
 
     @PostMapping()
@@ -40,7 +44,7 @@ public class FacturaController {
         return ResponseBuilder.buildResponse("Facturas encontradas.", HttpStatus.OK, facturas);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<GeneralResponse> actualizar(
             @PathVariable UUID id,
             @RequestParam UUID empresaId,
@@ -60,5 +64,11 @@ public class FacturaController {
     public ResponseEntity<GeneralResponse> enviar(@PathVariable UUID id, @RequestParam UUID empresaId) {
         FacturaResponse factura = facturaService.enviarAHacienda(empresaId, id);
         return ResponseBuilder.buildResponse("Factura enviada a Hacienda.", HttpStatus.OK, factura);
+    }
+
+    @GetMapping("/{id}/dte")
+    public ResponseEntity<GeneralResponse> getDte(@PathVariable UUID id, @RequestParam UUID empresaId) {
+        DteFacturaElectronica dte = dteService.generarDte(empresaId, id);
+        return ResponseBuilder.buildResponse("DTE generado correctamente.", HttpStatus.OK, dte);
     }
 }

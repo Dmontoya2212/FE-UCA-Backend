@@ -4,7 +4,6 @@ import com.feuca.facturacion.dto.request.FacturaLinea.FacturaLineaUpdateRequest;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
-import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import com.feuca.facturacion.exception.Factura.FacturaNoEditableException;
 import com.feuca.facturacion.exception.Factura.FacturaNotFoundException;
 import com.feuca.facturacion.exception.FacturaLinea.FacturaLineaNotFoundException;
@@ -38,7 +37,7 @@ public class FacturaLineaServiceImpl implements FacturaLineaService {
 
     // DESPUÉS
     private void validarEditable(Factura f) {
-        if (f.getEstado() != InvoiceStatus.BORRADOR) {
+        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede actualizar.");
         }
     }

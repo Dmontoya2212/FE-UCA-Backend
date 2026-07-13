@@ -7,7 +7,6 @@ import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
-import com.feuca.facturacion.entity.enums.InvoiceStatus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,8 +24,9 @@ public class FacturaMapper {
                 .clienteId(req.getClienteId())
                 .numero(req.getNumero())
                 .fechaEmision(req.getFechaEmision())
-                .estado(InvoiceStatus.BORRADOR)
+                .estado("BORRADOR")
                 .monedaCodigo(req.getMonedaCodigo() != null ? req.getMonedaCodigo() : "USD")
+                .tipoDte(req.getTipoDte() != null ? req.getTipoDte() : "01")
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
@@ -67,6 +67,9 @@ public class FacturaMapper {
                 .empresaId(f.getEmpresaId())
                 .clienteId(f.getClienteId())
                 .clienteNombre(clienteNombre)
+                .clienteNombreRazonSocial(f.getClienteNombreRazonSocial() != null ? f.getClienteNombreRazonSocial() : clienteNombre)
+                .clienteNifCif(f.getClienteNifCif())
+                .clienteDireccion(f.getClienteDireccion())
                 .numero(f.getNumero())
                 .fechaEmision(f.getFechaEmision())
                 .estado(f.getEstado())
@@ -74,6 +77,11 @@ public class FacturaMapper {
                 .subtotalSinIva(f.getSubtotalSinIva())
                 .totalIva(f.getTotalIva())
                 .totalConIva(f.getTotalConIva())
+                .tipoDte(f.getTipoDte())
+                .codigoGeneracion(f.getCodigoGeneracion())
+                .numeroControl(f.getNumeroControl())
+                .selloRecibido(f.getSelloRecibido())
+                .fechaRecepcion(f.getFechaRecepcion())
                 .lineas(lineasResponse)
                 .createdAt(f.getCreatedAt())
                 .updatedAt(f.getUpdatedAt())
@@ -102,6 +110,7 @@ public class FacturaMapper {
         if (req.getNumero() != null) f.setNumero(req.getNumero());
         if (req.getFechaEmision() != null) f.setFechaEmision(req.getFechaEmision());
         if (req.getMonedaCodigo() != null) f.setMonedaCodigo(req.getMonedaCodigo());
+        if (req.getTipoDte() != null) f.setTipoDte(req.getTipoDte());
         f.setUpdatedAt(OffsetDateTime.now());
     }
 }

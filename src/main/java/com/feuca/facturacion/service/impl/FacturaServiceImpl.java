@@ -5,7 +5,6 @@ import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
 import com.feuca.facturacion.entity.Factura;
 import com.feuca.facturacion.entity.FacturaLinea;
-import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import com.feuca.facturacion.exception.Factura.FacturaAlreadyExistsException;
 import com.feuca.facturacion.exception.Factura.FacturaNoEditableException;
 import com.feuca.facturacion.exception.Factura.FacturaNotFoundException;
@@ -13,6 +12,7 @@ import com.feuca.facturacion.mapper.FacturaMapper;
 import com.feuca.facturacion.repository.ClienteRepository;
 import com.feuca.facturacion.repository.FacturaLineaRepository;
 import com.feuca.facturacion.repository.FacturaRepository;
+import com.feuca.facturacion.service.DteService;
 import com.feuca.facturacion.service.FacturaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,25 +29,35 @@ public class FacturaServiceImpl implements FacturaService {
     private final FacturaRepository facturaRepository;
     private final FacturaLineaRepository facturaLineaRepository;
     private final ClienteRepository clienteRepository;
+    private final DteService dteService;
 
     public FacturaServiceImpl(FacturaRepository facturaRepository,
                               FacturaLineaRepository facturaLineaRepository,
-                              ClienteRepository clienteRepository) {
+                              ClienteRepository clienteRepository,
+                              DteService dteService) {
         this.facturaRepository = facturaRepository;
         this.facturaLineaRepository = facturaLineaRepository;
         this.clienteRepository = clienteRepository;
+        this.dteService = dteService;
     }
 
     @Override
     @Transactional
     public FacturaResponse create(FacturaRequest request) {
-
-        String numero = request.getNumero().trim();
-        boolean exists = facturaRepository.existsByEmpresaIdAndNumero(request.getEmpresaId(), numero);
-        if (exists) throw new FacturaAlreadyExistsException("Ya existe una factura con este correlativo.");
-        request.setNumero(numero);
-
         Factura factura = FacturaMapper.toEntityCreate(request);
+
+        dteService.asignarCodigos(factura);
+        factura.setNumero(factura.getNumeroControl());
+
+        String clienteNombre = null;
+        if (factura.getClienteId() != null) {
+            clienteRepository.findById(factura.getClienteId()).ifPresent(c -> {
+                factura.setClienteNombreRazonSocial(c.getNombreRazonSocial());
+                factura.setClienteNifCif(c.getNifCif());
+                factura.setClienteDireccion(c.getDireccion());
+            });
+        }
+
         Factura savedFactura = facturaRepository.save(factura);
 
         List<FacturaLinea> lineas = request.getLineas().stream()
@@ -73,7 +83,7 @@ public class FacturaServiceImpl implements FacturaService {
         savedFactura.setTotalConIva(totalConIva);
         facturaRepository.save(savedFactura);
 
-        String clienteNombre = null;
+        clienteNombre = null;
         if (savedFactura.getClienteId() != null) {
             clienteNombre = clienteRepository.findById(savedFactura.getClienteId())
                     .map(c -> c.getNombreRazonSocial())
@@ -123,18 +133,12 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (f.getEstado() != InvoiceStatus.BORRADOR) {
+        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede editar.");
         }
 
-        if (request.getNumero() != null) {
-            String numero = request.getNumero().trim();
-            boolean exists = facturaRepository.existsByEmpresaIdAndNumero(empresaId, numero);
-            if (exists && !numero.equalsIgnoreCase(f.getNumero())) {
-                throw new FacturaAlreadyExistsException("Ya existe una factura con este correlativo.");
-            }
-            request.setNumero(numero);
-        }
+        // No se actualiza el numero ni los codigos de generacion/control
+        request.setNumero(null);
 
         FacturaMapper.applyUpdate(f, request);
         Factura saved = facturaRepository.save(f);
@@ -156,7 +160,7 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (f.getEstado() != InvoiceStatus.BORRADOR) {
+        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
             throw new FacturaNoEditableException("La factura ya fue enviada y no se puede eliminar.");
         }
 
@@ -170,11 +174,17 @@ public class FacturaServiceImpl implements FacturaService {
         Factura f = facturaRepository.findByIdAndEmpresaId(facturaId, empresaId)
                 .orElseThrow(() -> new FacturaNotFoundException("Factura no encontrada."));
 
-        if (f.getEstado() != InvoiceStatus.BORRADOR) {
+        if (!"BORRADOR".equalsIgnoreCase(f.getEstado())) {
             throw new FacturaNoEditableException("La factura ya fue enviada.");
         }
 
-        f.setEstado(InvoiceStatus.EMITIDA);
+        // Generate DTE to assign numeroControl and codigoGeneracion
+        dteService.generarDte(empresaId, facturaId);
+
+        // Fetch the updated Factura instance
+        f = facturaRepository.findById(facturaId).orElseThrow();
+
+        f.setEstado("EMITIDA");
         Factura saved = facturaRepository.save(f);
 
         List<FacturaLinea> lineas = facturaLineaRepository.findAllByFacturaId(facturaId);

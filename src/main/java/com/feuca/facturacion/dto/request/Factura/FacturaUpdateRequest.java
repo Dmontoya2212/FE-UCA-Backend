@@ -14,4 +14,5 @@ public class FacturaUpdateRequest {
     private String numero;
     private LocalDate fechaEmision;
     private String monedaCodigo;
+    private String tipoDte;
 }

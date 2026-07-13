@@ -42,6 +42,27 @@ public class Cliente {
     @Column(name = "telefono")
     private String telefono;
 
+    @Column(name = "tipo_documento", length = 2)
+    private String tipoDocumento;
+
+    @Column(name = "nrc", length = 8)
+    private String nrc;
+
+    @Column(name = "cod_actividad", length = 6)
+    private String codActividad;
+
+    @Column(name = "desc_actividad", length = 150)
+    private String descActividad;
+
+    @Column(name = "departamento", length = 2)
+    private String departamento;
+
+    @Column(name = "municipio", length = 2)
+    private String municipio;
+
+    @Column(name = "distrito", length = 4)
+    private String distrito;
+
     @Column(name = "activo")
     private Boolean activo;
 

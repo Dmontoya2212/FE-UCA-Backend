@@ -1,7 +1,6 @@
 package com.feuca.facturacion.dto.response.Factura;
 
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
-import com.feuca.facturacion.entity.enums.InvoiceStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,13 +19,21 @@ public class FacturaResponse {
     private UUID empresaId;
     private UUID clienteId;
     private String clienteNombre;
+    private String clienteNombreRazonSocial;
+    private String clienteNifCif;
+    private String clienteDireccion;
     private String numero;
     private LocalDate fechaEmision;
-    private InvoiceStatus estado;
+    private String estado;
     private String monedaCodigo;
     private BigDecimal subtotalSinIva;
     private BigDecimal totalIva;
     private BigDecimal totalConIva;
+    private String tipoDte;
+    private String codigoGeneracion;
+    private String numeroControl;
+    private String selloRecibido;
+    private OffsetDateTime fechaRecepcion;
     private List<FacturaLineaResponse> lineas;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

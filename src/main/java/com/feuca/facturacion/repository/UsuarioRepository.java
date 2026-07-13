@@ -9,13 +9,13 @@ import java.util.*;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
-    Optional<Usuario> findByIdAndEmpresaId(UUID id, UUID empresaId);
+    Optional<Usuario> findByIdAndEmpresasId(UUID id, UUID empresaId);
 
-    List<Usuario> findAllByEmpresaId(UUID empresaId);
+    List<Usuario> findAllByEmpresasId(UUID empresaId);
 
-    Optional<Usuario> findByEmpresaIdAndEmail(UUID empresaId, String email);
+    Optional<Usuario> findByEmpresasIdAndEmail(UUID empresaId, String email);
 
-    boolean existsByEmpresaIdAndEmail(UUID empresaId, String email);
+    boolean existsByEmpresasIdAndEmail(UUID empresaId, String email);
 
     Optional<Usuario> findByEmail(String email);
 }

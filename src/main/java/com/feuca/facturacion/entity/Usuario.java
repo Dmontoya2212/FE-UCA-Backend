@@ -12,14 +12,18 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Usuario {
     @Id
     @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "empresa_id", columnDefinition = "uuid", nullable = false)
-    private UUID empresaId;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "usuario_empresas",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "empresa_id")
+    )
+    private java.util.List<Empresa> empresas;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -28,17 +32,20 @@ public class Usuario {
     private String email;
 
     @Column(name = "password_hash", nullable = false)
-    private String password_hash;
+    private String passwordHash;
 
     @Column(name = "es_admin", nullable = false)
-    private Boolean es_admin;
+    private Boolean esAdmin;
+
+    @Column(name = "rol", length = 20)
+    private String rol;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
     @Column(name = "created_at")
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updated_at;
+    private OffsetDateTime updatedAt;
 }

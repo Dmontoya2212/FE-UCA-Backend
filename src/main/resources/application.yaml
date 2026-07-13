@@ -31,3 +31,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+jwt:
+  secret: feuca-facturacion-electronica-secret-key-2026-el-salvador-jwt-signing-key-256bits
+  expiration-ms: 86400000

@@ -23,7 +23,6 @@ public class FacturaRequest {
 
     private UUID clienteId;
 
-    @NotBlank
     private String numero;
 
     @NotNull
@@ -31,6 +30,9 @@ public class FacturaRequest {
 
     @JsonProperty("moneda_codigo")
     private String monedaCodigo;
+
+    @JsonProperty("tipo_dte")
+    private String tipoDte;
 
     @NotEmpty
     @Valid

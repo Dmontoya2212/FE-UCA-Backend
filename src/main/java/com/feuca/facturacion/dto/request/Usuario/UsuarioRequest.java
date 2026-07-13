@@ -14,8 +14,8 @@ import java.util.UUID;
 
 public class UsuarioRequest {
 
-    @NotNull(message = "EmpresaID es obligatorio")
-    private UUID empresaId;
+    @NotNull(message = "Debe proporcionar al menos una empresa")
+    private java.util.List<UUID> empresaIds;
 
     @NotBlank(message = "El nombre del usuario es obligatorio")
     private String nombre;
@@ -28,5 +28,7 @@ public class UsuarioRequest {
     private String password;
 
     private Boolean esAdmin;
+
+    private String rol;
 
 }

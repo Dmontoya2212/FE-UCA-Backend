@@ -34,18 +34,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         String emailNormalizado = req.getEmail().toLowerCase().trim();
 
-        boolean exists = usuarioRepository.existsByEmpresaIdAndEmail(req.getEmpresaId(), emailNormalizado);
+        boolean exists = usuarioRepository.existsByEmpresasIdAndEmail(req.getEmpresaIds().get(0), emailNormalizado);
         if (exists) throw new UsuarioAlreadyExistsException("Ya existe un usuario con ese email en la empresa.");
 
         String hash = passwordEncoder.encode(req.getPassword());
 
         Usuario entity = UsuarioMapper.toEntityCreate(
                 UsuarioRequest.builder()
-                        .empresaId(req.getEmpresaId())
+                        .empresaIds(req.getEmpresaIds())
                         .nombre(req.getNombre())
                         .email(emailNormalizado)
                         .password(req.getPassword())
                         .esAdmin(req.getEsAdmin())
+                        .rol(req.getRol())
                         .build(),
                 hash
         );
@@ -56,7 +57,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponse getById(UUID empresaId, UUID usuarioId) {
-        Usuario u = usuarioRepository.findByIdAndEmpresaId(usuarioId, empresaId)
+        Usuario u = usuarioRepository.findByIdAndEmpresasId(usuarioId, empresaId)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado."));
         return UsuarioMapper.toResponse(u);
     }
@@ -64,14 +65,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioResponse getByEmail(UUID empresaId, String email) {
         String emailNormalizado = email.toLowerCase().trim();
-        Usuario u = usuarioRepository.findByEmpresaIdAndEmail(empresaId, emailNormalizado)
+        Usuario u = usuarioRepository.findByEmpresasIdAndEmail(empresaId, emailNormalizado)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado."));
         return UsuarioMapper.toResponse(u);
     }
 
     @Override
     public List<UsuarioResponse> getAllByEmpresa(UUID empresaId) {
-        return usuarioRepository.findAllByEmpresaId(empresaId)
+        return usuarioRepository.findAllByEmpresasId(empresaId)
                 .stream()
                 .map(UsuarioMapper::toResponse)
                 .collect(Collectors.toList());
@@ -81,14 +82,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public UsuarioResponse update(UUID empresaId, UUID usuarioId, UsuarioUpdateRequest req) {
 
-        Usuario u = usuarioRepository.findByIdAndEmpresaId(usuarioId, empresaId)
+        Usuario u = usuarioRepository.findByIdAndEmpresasId(usuarioId, empresaId)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado."));
 
         // si cambia email, validar duplicado por empresa
         if (req.getEmail() != null) {
             String emailNormalizado = req.getEmail().toLowerCase().trim();
 
-            boolean exists = usuarioRepository.existsByEmpresaIdAndEmail(empresaId, emailNormalizado);
+            boolean exists = usuarioRepository.existsByEmpresasIdAndEmail(empresaId, emailNormalizado);
             if (exists && !emailNormalizado.equalsIgnoreCase(u.getEmail())) {
                 throw new UsuarioAlreadyExistsException("Ya existe un usuario con ese email en la empresa.");
             }
@@ -109,7 +110,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public void delete(UUID empresaId, UUID usuarioId) {
-        Usuario u = usuarioRepository.findByIdAndEmpresaId(usuarioId, empresaId)
+        Usuario u = usuarioRepository.findByIdAndEmpresasId(usuarioId, empresaId)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado."));
         usuarioRepository.delete(u);
     }

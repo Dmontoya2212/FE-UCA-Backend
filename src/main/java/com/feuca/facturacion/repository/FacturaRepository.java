@@ -13,4 +13,6 @@ public interface FacturaRepository extends JpaRepository<Factura, UUID> {
     Optional<Factura> findByIdAndEmpresaId(UUID id, UUID empresaId);
     List<Factura> findAllByEmpresaId(UUID empresaId);
     boolean existsByEmpresaIdAndNumero(UUID empresaId, String numero);
+    boolean existsByEmpresaIdAndNumeroControl(UUID empresaId, String numeroControl);
+    Optional<Factura> findFirstByEmpresaIdAndTipoDteOrderByNumeroDesc(UUID empresaId, String tipoDte);
 }
