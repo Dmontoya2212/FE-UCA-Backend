@@ -43,7 +43,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_SQL_BIND_LEVEL:WARN}
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET:d0a124ca4adb62b1ed06b4aa632f2825fe44cedbb64c9b42dc7fac5df6d23382}
   expiration-ms: ${JWT_EXPIRATION_MS:900000}
   issuer: ${JWT_ISSUER:feuca-facturacion}
 
@@ -61,7 +61,7 @@ security:
 
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
     allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
   database-initializer:
     enabled: ${DATABASE_INITIALIZER_ENABLED:false}
