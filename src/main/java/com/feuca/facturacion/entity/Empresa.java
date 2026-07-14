@@ -36,6 +36,9 @@ public class Empresa {
     @Column(name = "actividad_economica")
     private String actividadEconomica;
 
+    @Column(name = "cod_actividad", length = 6)
+    private String codActividad;
+
     @Column(name = "sector_empresa")
     private String sectorEmpresa;
 
@@ -54,16 +57,31 @@ public class Empresa {
     @Column(name = "codigo_postal")
     private String codigoPostal;
 
+    @Column(name = "departamento", length = 2)
+    private String departamento;
+
+    @Column(name = "municipio", length = 2)
+    private String municipio;
+
+    @Column(name = "distrito", length = 4)
+    private String distrito;
+
+    @Column(name = "cod_establecimiento", length = 4)
+    private String codEstablecimiento;
+
+    @Column(name = "cod_punto_venta", length = 15)
+    private String codPuntoVenta;
+
     @Column(name = "pais")
     private String pais;
 
     @Column(name = "usuario")
     private String usuario;
 
-    @Column(name = "password_hash")
+    @Column(name = "password_hash", columnDefinition = "TEXT")
     private String passwordHash;
 
-    @Column(name = "clave_primaria")
+    @Column(name = "clave_primaria", columnDefinition = "TEXT")
     private String clavePrimaria;
 
     @Column(name = "token", columnDefinition = "TEXT")

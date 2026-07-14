@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/facturacion/usuario")
+@RequestMapping("/api/v1")
 
 public class UsuarioController {
     private final UsuarioService usuarioService;
@@ -24,42 +24,42 @@ public class UsuarioController {
 }
 
     // CREATE
-    @PostMapping()
+    @PostMapping("/facturacion/usuario")
     public ResponseEntity<GeneralResponse> crear(@RequestBody @Valid UsuarioRequest request) {
         UsuarioResponse usuario = usuarioService.create(request);
         return ResponseBuilder.buildResponse("Usuario creado", HttpStatus.CREATED, usuario);
     }
 
     // READ
-    @GetMapping("/{id}")
+    @GetMapping("/empresas/{empresaId}/usuarios/{id}")
     public ResponseEntity<GeneralResponse> getById(
-            @PathVariable UUID id,
-            @RequestParam UUID empresaId
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
     ) {
         UsuarioResponse usuario = usuarioService.getById(empresaId, id);
         return ResponseBuilder.buildResponse("Usuario encontrado.", HttpStatus.OK, usuario);
     }
 
-    @GetMapping("/email/{email}")
+    @GetMapping("/empresas/{empresaId}/usuarios/email/{email}")
     public ResponseEntity<GeneralResponse> getByEmail(
-            @PathVariable String email,
-            @RequestParam UUID empresaId
+            @PathVariable UUID empresaId,
+            @PathVariable String email
     ) {
         UsuarioResponse usuario = usuarioService.getByEmail(empresaId, email);
         return ResponseBuilder.buildResponse("Usuario encontrado.", HttpStatus.OK, usuario);
     }
 
-    @GetMapping()
-    public ResponseEntity<GeneralResponse> getAllByEmpresa(@RequestParam UUID empresaId) {
+    @GetMapping("/empresas/{empresaId}/usuarios")
+    public ResponseEntity<GeneralResponse> getAllByEmpresa(@PathVariable UUID empresaId) {
         List<UsuarioResponse> usuarios = usuarioService.getAllByEmpresa(empresaId);
         return ResponseBuilder.buildResponse("Usuarios encontrados.", HttpStatus.OK, usuarios);
     }
 
     // UPDATE
-    @PatchMapping("/{id}")
+    @PatchMapping("/empresas/{empresaId}/usuarios/{id}")
     public ResponseEntity<GeneralResponse> actualizar(
+            @PathVariable UUID empresaId,
             @PathVariable UUID id,
-            @RequestParam UUID empresaId,
             @RequestBody UsuarioUpdateRequest request
     ) {
         UsuarioResponse usuario = usuarioService.update(empresaId, id, request);
@@ -67,10 +67,10 @@ public class UsuarioController {
     }
 
     // DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/empresas/{empresaId}/usuarios/{id}")
     public ResponseEntity<GeneralResponse> eliminar(
-            @PathVariable UUID id,
-            @RequestParam UUID empresaId
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
     ) {
         usuarioService.delete(empresaId, id);
         return ResponseBuilder.buildResponse("Usuario eliminado.", HttpStatus.OK, null);

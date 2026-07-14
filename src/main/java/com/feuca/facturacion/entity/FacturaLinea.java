@@ -28,6 +28,18 @@ public class FacturaLinea {
     @Column(name = "descripcion", nullable = false, length = 220)
     private String descripcion;
 
+    @Column(name = "item_codigo_interno", length = 25)
+    private String itemCodigoInterno;
+
+    @Column(name = "item_unidad_medida")
+    private Integer itemUnidadMedida;
+
+    @Column(name = "item_tipo")
+    private Integer itemTipo;
+
+    @Column(name = "item_categoria")
+    private String itemCategoria;
+
     @Column(name = "cantidad", precision = 12, scale = 2, nullable = false)
     private BigDecimal cantidad;
 

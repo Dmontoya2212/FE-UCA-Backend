@@ -8,7 +8,9 @@ import com.feuca.facturacion.exception.Cliente.ClienteAlreadyExistsException;
 import com.feuca.facturacion.exception.Cliente.ClienteNotFoundException;
 import com.feuca.facturacion.mapper.ClienteMapper;
 import com.feuca.facturacion.repository.ClienteRepository;
+import com.feuca.facturacion.service.AccessControlService;
 import com.feuca.facturacion.service.ClienteService;
+import com.feuca.facturacion.util.DataNormalizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +23,12 @@ import java.util.UUID;
 public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final AccessControlService accessControlService;
 
     @Autowired
-    public ClienteServiceImpl(ClienteRepository clienteRepository) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, AccessControlService accessControlService) {
         this.clienteRepository = clienteRepository;
+        this.accessControlService = accessControlService;
     }
 
     // CREATE
@@ -33,12 +37,16 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteResponse create(ClienteRequest request) {
 
         UUID empresaId = request.getEmpresaId();
+        accessControlService.requireEmpresaAccess(empresaId);
 
-        if (request.getNifCif() != null && clienteRepository.existsByEmpresaIdAndNifCif(empresaId, request.getNifCif())) {
+        String nifCif = DataNormalizer.identifier(request.getNifCif());
+        String email = DataNormalizer.email(request.getEmail());
+
+        if (nifCif != null && clienteRepository.existsByEmpresaIdAndNifCifIgnoreCase(empresaId, nifCif)) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese NIF/CIF para esta empresa.");
         }
 
-        if (request.getEmail() != null && clienteRepository.existsByEmpresaIdAndEmail(empresaId, request.getEmail())) {
+        if (email != null && clienteRepository.existsByEmpresaIdAndEmailIgnoreCase(empresaId, email)) {
             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese email para esta empresa.");
         }
 
@@ -59,6 +67,7 @@ public class ClienteServiceImpl implements ClienteService {
         if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con id: " + id);
         }
+        accessControlService.requireEmpresaAccess(entity.getEmpresaId());
 
         return ClienteMapper.to_response(entity);
     }
@@ -67,8 +76,9 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional(readOnly = true)
     public ClienteResponse getByEmpresaIdAndNifCif(UUID empresaId, String nifCif) {
 
-        Cliente entity = clienteRepository.findByEmpresaIdAndNifCif(empresaId, nifCif)
+        Cliente entity = clienteRepository.findByEmpresaIdAndNifCifIgnoreCase(empresaId, DataNormalizer.identifier(nifCif))
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con ese NIF/CIF."));
+        accessControlService.requireEmpresaAccess(empresaId);
 
         if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con ese NIF/CIF.");
@@ -81,8 +91,9 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional(readOnly = true)
     public ClienteResponse getByEmpresaIdAndEmail(UUID empresaId, String email) {
 
-        Cliente entity = clienteRepository.findByEmpresaIdAndEmail(empresaId, email)
+        Cliente entity = clienteRepository.findByEmpresaIdAndEmailIgnoreCase(empresaId, DataNormalizer.email(email))
                 .orElseThrow(() -> new ClienteNotFoundException("Cliente no encontrado con ese email."));
+        accessControlService.requireEmpresaAccess(empresaId);
 
         if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con ese email.");
@@ -94,6 +105,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> getAllByEmpresaId(UUID empresaId) {
+        accessControlService.requireEmpresaAccess(empresaId);
         return clienteRepository.findAllByEmpresaId(empresaId).stream()
                 .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
@@ -103,6 +115,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> getAllActivosByEmpresaId(UUID empresaId) {
+        accessControlService.requireEmpresaAccess(empresaId);
         return clienteRepository.findAllByEmpresaIdAndActivoTrue(empresaId).stream()
                 .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
@@ -112,6 +125,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> searchByNombre(UUID empresaId, String nombre) {
+        accessControlService.requireEmpresaAccess(empresaId);
         return clienteRepository.findAllByEmpresaIdAndNombreRazonSocialContainingIgnoreCase(empresaId, nombre).stream()
                 .filter(c -> c.getDeletedAt() == null)
                 .map(ClienteMapper::to_response)
@@ -131,9 +145,13 @@ public class ClienteServiceImpl implements ClienteService {
         }
 
         UUID empresaId = entity.getEmpresaId();
+        accessControlService.requireEmpresaAccess(empresaId);
 
-        if (request.getNifCif() != null) {
-            clienteRepository.findByEmpresaIdAndNifCif(empresaId, request.getNifCif())
+        String nifCif = DataNormalizer.identifier(request.getNifCif());
+        String email = DataNormalizer.email(request.getEmail());
+
+        if (nifCif != null) {
+            clienteRepository.findByEmpresaIdAndNifCifIgnoreCase(empresaId, nifCif)
                     .ifPresent(found -> {
                         if (!found.getId().equals(entity.getId())) {
                             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese NIF/CIF para esta empresa.");
@@ -141,8 +159,8 @@ public class ClienteServiceImpl implements ClienteService {
                     });
         }
 
-        if (request.getEmail() != null) {
-            clienteRepository.findByEmpresaIdAndEmail(empresaId, request.getEmail())
+        if (email != null) {
+            clienteRepository.findByEmpresaIdAndEmailIgnoreCase(empresaId, email)
                     .ifPresent(found -> {
                         if (!found.getId().equals(entity.getId())) {
                             throw new ClienteAlreadyExistsException("Ya existe un cliente con ese email para esta empresa.");
@@ -167,6 +185,7 @@ public class ClienteServiceImpl implements ClienteService {
         if (entity.getDeletedAt() != null) {
             throw new ClienteNotFoundException("Cliente no encontrado con id: " + id);
         }
+        accessControlService.requireEmpresaAccess(entity.getEmpresaId());
 
         entity.setDeletedAt(OffsetDateTime.now());
         entity.setUpdatedAt(OffsetDateTime.now());

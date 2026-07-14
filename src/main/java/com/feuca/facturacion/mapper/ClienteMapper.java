@@ -4,6 +4,7 @@ import com.feuca.facturacion.dto.request.Cliente.ClienteRequest;
 import com.feuca.facturacion.dto.request.Cliente.ClienteUpdateRequest;
 import com.feuca.facturacion.dto.response.Cliente.ClienteResponse;
 import com.feuca.facturacion.entity.Cliente;
+import com.feuca.facturacion.util.DataNormalizer;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -14,13 +15,13 @@ public class ClienteMapper {
         return Cliente.builder()
                 .id(UUID.randomUUID())
                 .empresaId(empresaId)
-                .nombreRazonSocial(request.getNombreRazonSocial())
-                .nifCif(request.getNifCif())
-                .email(request.getEmail())
-                .direccion(request.getDireccion())
-                .ciudad(request.getCiudad())
-                .codigoPostal(request.getCodigoPostal())
-                .telefono(request.getTelefono())
+                .nombreRazonSocial(DataNormalizer.displayText(request.getNombreRazonSocial()))
+                .nifCif(DataNormalizer.identifier(request.getNifCif()))
+                .email(DataNormalizer.email(request.getEmail()))
+                .direccion(DataNormalizer.displayText(request.getDireccion()))
+                .ciudad(DataNormalizer.displayText(request.getCiudad()))
+                .codigoPostal(DataNormalizer.identifier(request.getCodigoPostal()))
+                .telefono(DataNormalizer.phone(request.getTelefono()))
                 .activo(request.getActivo() != null ? request.getActivo() : true)
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
@@ -29,13 +30,13 @@ public class ClienteMapper {
     }
 
     public static void update_entity(Cliente entity, ClienteUpdateRequest request) {
-        if (request.getNombreRazonSocial() != null) entity.setNombreRazonSocial(request.getNombreRazonSocial());
-        if (request.getNifCif() != null) entity.setNifCif(request.getNifCif());
-        if (request.getEmail() != null) entity.setEmail(request.getEmail());
-        if (request.getDireccion() != null) entity.setDireccion(request.getDireccion());
-        if (request.getCiudad() != null) entity.setCiudad(request.getCiudad());
-        if (request.getCodigoPostal() != null) entity.setCodigoPostal(request.getCodigoPostal());
-        if (request.getTelefono() != null) entity.setTelefono(request.getTelefono());
+        if (request.getNombreRazonSocial() != null) entity.setNombreRazonSocial(DataNormalizer.displayText(request.getNombreRazonSocial()));
+        if (request.getNifCif() != null) entity.setNifCif(DataNormalizer.identifier(request.getNifCif()));
+        if (request.getEmail() != null) entity.setEmail(DataNormalizer.email(request.getEmail()));
+        if (request.getDireccion() != null) entity.setDireccion(DataNormalizer.displayText(request.getDireccion()));
+        if (request.getCiudad() != null) entity.setCiudad(DataNormalizer.displayText(request.getCiudad()));
+        if (request.getCodigoPostal() != null) entity.setCodigoPostal(DataNormalizer.identifier(request.getCodigoPostal()));
+        if (request.getTelefono() != null) entity.setTelefono(DataNormalizer.phone(request.getTelefono()));
         if (request.getActivo() != null) entity.setActivo(request.getActivo());
 
         entity.setUpdatedAt(OffsetDateTime.now());

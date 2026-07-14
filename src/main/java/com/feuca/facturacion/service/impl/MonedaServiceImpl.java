@@ -6,6 +6,7 @@ import com.feuca.facturacion.exception.Moneda.MonedaNotFoundException;
 import com.feuca.facturacion.mapper.MonedaMapper;
 import com.feuca.facturacion.repository.MonedaRepository;
 import com.feuca.facturacion.service.MonedaService;
+import com.feuca.facturacion.util.DataNormalizer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class MonedaServiceImpl implements MonedaService {
     @Override
     public MonedaResponse getByCodigo(String codigo) {
 
-        String codigoNormalizado = codigo.toLowerCase().trim();
+        String codigoNormalizado = DataNormalizer.identifier(codigo);
 
         Moneda moneda = monedaRepository.findByCodigo(codigoNormalizado)
                 .orElseThrow(() -> new MonedaNotFoundException("Moneda no encontrada"));
@@ -35,7 +36,7 @@ public class MonedaServiceImpl implements MonedaService {
     @Override
     public MonedaResponse getByNombre(String nombre) {
 
-        String nombreNormalizado = nombre.toLowerCase().trim();
+        String nombreNormalizado = DataNormalizer.displayText(nombre);
 
         Moneda moneda = monedaRepository.findByNombre(nombreNormalizado)
                 .orElseThrow(() -> new MonedaNotFoundException("Moneda no encontrada"));
@@ -46,7 +47,7 @@ public class MonedaServiceImpl implements MonedaService {
     @Override
     public MonedaResponse getBySimbolo(String simbolo) {
 
-        String simboloNormalizado = simbolo.toLowerCase().trim();
+        String simboloNormalizado = DataNormalizer.displayText(simbolo);
         Moneda moneda = monedaRepository.findBySimbolo(simboloNormalizado)
                 .orElseThrow(() -> new MonedaNotFoundException("Moneda no encontrada"));
 

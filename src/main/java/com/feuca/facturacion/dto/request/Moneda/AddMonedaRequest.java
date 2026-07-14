@@ -15,4 +15,7 @@ public class AddMonedaRequest {
     @JsonProperty("codigo_moneda")
     @NotEmpty(message = "Debe enviar al menos una moneda")
     private List<String> codigos;
+
+    @JsonProperty("moneda_principal")
+    private String monedaPrincipal;
 }

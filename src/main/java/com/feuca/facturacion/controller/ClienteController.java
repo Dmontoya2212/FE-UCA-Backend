@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/facturacion/cliente")
+@RequestMapping("/api/v1/empresas/{empresaId}/clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -27,8 +27,10 @@ public class ClienteController {
     // CREATE
     @PostMapping("")
     public ResponseEntity<GeneralResponse> create(
+            @PathVariable UUID empresaId,
             @RequestBody @Valid ClienteRequest request
     ) {
+        request.setEmpresaId(empresaId);
         ClienteResponse cliente = clienteService.create(request);
 
         return ResponseBuilder.buildResponse(
@@ -40,7 +42,10 @@ public class ClienteController {
 
     // READ
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse> getById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> getById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         ClienteResponse cliente = clienteService.getById(id);
 
         return ResponseBuilder.buildResponse(
@@ -50,7 +55,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}")
+    @GetMapping("")
     public ResponseEntity<GeneralResponse> getAllByEmpresa(@PathVariable UUID empresaId) {
         List<ClienteResponse> clientes = clienteService.getAllByEmpresaId(empresaId);
 
@@ -61,7 +66,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/activos")
+    @GetMapping("/activos")
     public ResponseEntity<GeneralResponse> getAllActivosByEmpresa(@PathVariable UUID empresaId) {
         List<ClienteResponse> clientes = clienteService.getAllActivosByEmpresaId(empresaId);
 
@@ -72,7 +77,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/nif/{nifCif}")
+    @GetMapping("/nif/{nifCif}")
     public ResponseEntity<GeneralResponse> getByEmpresaAndNifCif(
             @PathVariable UUID empresaId,
             @PathVariable String nifCif
@@ -86,7 +91,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/email/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<GeneralResponse> getByEmpresaAndEmail(
             @PathVariable UUID empresaId,
             @PathVariable String email
@@ -100,7 +105,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/buscar")
+    @GetMapping("/buscar")
     public ResponseEntity<GeneralResponse> searchByNombre(
             @PathVariable UUID empresaId,
             @RequestParam(name = "nombre") String nombre
@@ -117,6 +122,7 @@ public class ClienteController {
     // UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<GeneralResponse> update(
+            @PathVariable UUID empresaId,
             @PathVariable UUID id,
             @RequestBody @Valid ClienteUpdateRequest request
     ) {
@@ -131,7 +137,10 @@ public class ClienteController {
 
     // DELETE (soft delete)
     @DeleteMapping("/{id}")
-    public ResponseEntity<GeneralResponse> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> deleteById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         ClienteResponse cliente = clienteService.deleteById(id);
 
         return ResponseBuilder.buildResponse(

@@ -35,6 +35,15 @@ public class ItemResponse {
     @JsonProperty("precio_sin_iva")
     private BigDecimal precioSinIva;
 
+    @JsonProperty("codigo_interno")
+    private String codigoInterno;
+
+    @JsonProperty("unidad_medida")
+    private Integer unidadMedida;
+
+    @JsonProperty("iva_porcentaje_snapshot")
+    private BigDecimal ivaPorcentajeSnapshot;
+
     @JsonProperty("activo")
     private Boolean activo;
 

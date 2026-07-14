@@ -11,11 +11,12 @@ import lombok.*;
 public class UsuarioUpdateRequest {
 
     private String nombre;
+    private java.util.List<java.util.UUID> empresaIds;
 
     @Email(message = "Correo Invalido")
     private String email;
 
-    private Boolean esAdmin;
+    private String rol;
     private Boolean activo;
     private String password;
 

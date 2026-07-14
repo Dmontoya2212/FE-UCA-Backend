@@ -19,15 +19,21 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
 
     // Buscar cliente por nif dentro de una empresa
     Optional<Cliente> findByEmpresaIdAndNifCif(UUID empresaId, String nifCif);
+    Optional<Cliente> findByEmpresaIdAndNifCifIgnoreCase(UUID empresaId, String nifCif);
+
+    Optional<Cliente> findByIdAndEmpresaId(UUID id, UUID empresaId);
 
     // Validar si ya existe un nif en la empresa
     boolean existsByEmpresaIdAndNifCif(UUID empresaId, String nifCif);
+    boolean existsByEmpresaIdAndNifCifIgnoreCase(UUID empresaId, String nifCif);
 
     // Buscar por email dentro de una empresa
     Optional<Cliente> findByEmpresaIdAndEmail(UUID empresaId, String email);
+    Optional<Cliente> findByEmpresaIdAndEmailIgnoreCase(UUID empresaId, String email);
 
     // Validar si existe email dentro de una empresa
     boolean existsByEmpresaIdAndEmail(UUID empresaId, String email);
+    boolean existsByEmpresaIdAndEmailIgnoreCase(UUID empresaId, String email);
 
     // Buscar por nombre/razon social
     List<Cliente> findAllByEmpresaIdAndNombreRazonSocialContainingIgnoreCase(UUID empresaId, String nombreRazonSocial);

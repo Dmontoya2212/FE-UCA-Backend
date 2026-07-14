@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/facturacion/item")
+@RequestMapping("/api/v1/empresas/{empresaId}/items")
 public class ItemController {
 
     private final ItemService itemService;
@@ -28,8 +28,10 @@ public class ItemController {
     // CREATE
     @PostMapping("")
     public ResponseEntity<GeneralResponse> create(
+            @PathVariable UUID empresaId,
             @RequestBody @Valid ItemRequest request
     ) {
+        request.setEmpresaId(empresaId);
         ItemResponse item = itemService.create(request);
 
         return ResponseBuilder.buildResponse(
@@ -41,7 +43,10 @@ public class ItemController {
 
     // READ
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse> getById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> getById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         ItemResponse item = itemService.getById(id);
 
         return ResponseBuilder.buildResponse(
@@ -51,7 +56,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}")
+    @GetMapping("")
     public ResponseEntity<GeneralResponse> getAllByEmpresa(@PathVariable UUID empresaId) {
         List<ItemResponse> items = itemService.getAllByEmpresaId(empresaId);
 
@@ -62,7 +67,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/activos")
+    @GetMapping("/activos")
     public ResponseEntity<GeneralResponse> getAllActivosByEmpresa(@PathVariable UUID empresaId) {
         List<ItemResponse> items = itemService.getAllActivosByEmpresaId(empresaId);
 
@@ -73,7 +78,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/nombre/{nombre}")
+    @GetMapping("/nombre/{nombre}")
     public ResponseEntity<GeneralResponse> getByEmpresaAndNombre(
             @PathVariable UUID empresaId,
             @PathVariable String nombre
@@ -87,7 +92,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/categoria/{categoria}")
+    @GetMapping("/categoria/{categoria}")
     public ResponseEntity<GeneralResponse> getAllByEmpresaAndCategoria(
             @PathVariable UUID empresaId,
             @PathVariable ItemCategoria categoria
@@ -101,7 +106,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/iva/{ivaId}")
+    @GetMapping("/iva/{ivaId}")
     public ResponseEntity<GeneralResponse> getAllByEmpresaAndIva(
             @PathVariable UUID empresaId,
             @PathVariable UUID ivaId
@@ -115,7 +120,7 @@ public class ItemController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/buscar")
+    @GetMapping("/buscar")
     public ResponseEntity<GeneralResponse> searchByNombre(
             @PathVariable UUID empresaId,
             @RequestParam(name = "nombre") String nombre
@@ -132,6 +137,7 @@ public class ItemController {
     // UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<GeneralResponse> update(
+            @PathVariable UUID empresaId,
             @PathVariable UUID id,
             @RequestBody @Valid ItemUpdateRequest request
     ) {
@@ -146,7 +152,10 @@ public class ItemController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<GeneralResponse> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> deleteById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         ItemResponse item = itemService.deleteById(id);
 
         return ResponseBuilder.buildResponse(

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/facturacion/iva")
+@RequestMapping("/api/v1/empresas/{empresaId}/iva")
 public class IvaTasaController {
 
     private final IvaTasaService ivaTasaService;
@@ -28,8 +28,10 @@ public class IvaTasaController {
     // CREATE
     @PostMapping("")
     public ResponseEntity<GeneralResponse> create(
+            @PathVariable UUID empresaId,
             @RequestBody @Valid IvaTasaRequest request
     ) {
+        request.setEmpresaId(empresaId);
         IvaTasaResponse iva = ivaTasaService.create(request);
 
         return ResponseBuilder.buildResponse(
@@ -41,7 +43,10 @@ public class IvaTasaController {
 
     // READ
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse> getById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> getById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         IvaTasaResponse iva = ivaTasaService.getById(id);
 
         return ResponseBuilder.buildResponse(
@@ -51,7 +56,7 @@ public class IvaTasaController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}")
+    @GetMapping("")
     public ResponseEntity<GeneralResponse> getAllByEmpresa(@PathVariable UUID empresaId) {
         List<IvaTasaResponse> ivas = ivaTasaService.getAllByEmpresaId(empresaId);
 
@@ -62,7 +67,7 @@ public class IvaTasaController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/porcentaje/{porcentaje}")
+    @GetMapping("/porcentaje/{porcentaje}")
     public ResponseEntity<GeneralResponse> getByEmpresaAndPorcentaje(
             @PathVariable UUID empresaId,
             @PathVariable BigDecimal porcentaje
@@ -76,7 +81,7 @@ public class IvaTasaController {
         );
     }
 
-    @GetMapping("/empresa/{empresaId}/nombre/{nombre}")
+    @GetMapping("/nombre/{nombre}")
     public ResponseEntity<GeneralResponse> getByEmpresaAndNombre(
             @PathVariable UUID empresaId,
             @PathVariable String nombre
@@ -93,6 +98,7 @@ public class IvaTasaController {
     // UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<GeneralResponse> update(
+            @PathVariable UUID empresaId,
             @PathVariable UUID id,
             @RequestBody @Valid IvaTasaUpdateRequest request
     ) {
@@ -107,7 +113,10 @@ public class IvaTasaController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<GeneralResponse> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<GeneralResponse> deleteById(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID id
+    ) {
         IvaTasaResponse iva = ivaTasaService.deleteById(id);
 
         return ResponseBuilder.buildResponse(
@@ -116,7 +125,7 @@ public class IvaTasaController {
                 iva
         );
     }
-    @DeleteMapping("/empresa/{empresaId}/nombre/{nombre}")
+    @DeleteMapping("/nombre/{nombre}")
     public ResponseEntity<GeneralResponse> deleteByEmpresaAndNombre(
             @PathVariable UUID empresaId,
             @PathVariable String nombre
@@ -130,7 +139,7 @@ public class IvaTasaController {
         );
     }
 
-    @DeleteMapping("/empresa/{empresaId}/porcentaje/{porcentaje}")
+    @DeleteMapping("/porcentaje/{porcentaje}")
     public ResponseEntity<GeneralResponse> deleteByEmpresaAndPorcentaje(
             @PathVariable UUID empresaId,
             @PathVariable BigDecimal porcentaje

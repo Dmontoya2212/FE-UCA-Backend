@@ -9,14 +9,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class UsuarioResponse {
     private UUID id;
-    private UUID empresa_id;
+    private java.util.List<UUID> empresaIds;
     private String nombre;
     private String email;
-    private Boolean es_admin;
+    private String rol;
     private Boolean activo;
-    private OffsetDateTime created_at;
-    private OffsetDateTime updated_at;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }

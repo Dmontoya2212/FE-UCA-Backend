@@ -25,9 +25,15 @@ public class IvaTasaResponse {
     @JsonProperty("porcentaje")
     private BigDecimal porcentaje;
 
+    @JsonProperty("activo")
+    private Boolean activo;
+
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
     @JsonProperty("updated_at")
     private OffsetDateTime updatedAt;
+
+    @JsonProperty("deleted_at")
+    private OffsetDateTime deletedAt;
 }

@@ -15,7 +15,6 @@ import java.util.UUID;
 public class ItemRequest {
 
     @JsonProperty("empresa_id")
-    @NotNull(message = "El ID de la empresa no puede ser nulo.")
     private UUID empresaId;
 
     @JsonProperty("nombre")
@@ -35,8 +34,18 @@ public class ItemRequest {
 
     @JsonProperty("precio_sin_iva")
     @NotNull(message = "El precio sin IVA no puede ser nulo.")
-//  @DecimalMin(value = "0.00", message = "El precio sin IVA no puede ser menor a 0.")
+    @DecimalMin(value = "0.00", message = "El precio sin IVA no puede ser menor a 0.")
+    @Digits(integer = 10, fraction = 8, message = "El precio sin IVA permite hasta 10 enteros y 8 decimales.")
     private BigDecimal precioSinIva;
+
+    @JsonProperty("codigo_interno")
+    @Size(max = 25, message = "El codigo interno no puede exceder 25 caracteres.")
+    private String codigoInterno;
+
+    @JsonProperty("unidad_medida")
+    @Min(value = 1, message = "La unidad de medida DTE debe ser mayor o igual a 1.")
+    @Max(value = 99, message = "La unidad de medida DTE debe ser menor o igual a 99.")
+    private Integer unidadMedida;
 
     @JsonProperty("activo")
     private Boolean activo;

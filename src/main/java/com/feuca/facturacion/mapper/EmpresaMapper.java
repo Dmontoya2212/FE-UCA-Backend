@@ -1,11 +1,13 @@
 package com.feuca.facturacion.mapper;
 
 import com.feuca.facturacion.dto.request.Empresa.EmpresaRequest;
+import com.feuca.facturacion.dto.request.Empresa.EmpresaIntegrationUpdateRequest;
 import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
 import com.feuca.facturacion.dto.response.Moneda.MonedaResponse;
 import com.feuca.facturacion.entity.Empresa;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.feuca.facturacion.service.SecretEncryptionService;
+import com.feuca.facturacion.util.DataNormalizer;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -15,50 +17,54 @@ import java.util.UUID;
 public class EmpresaMapper {
     private EmpresaMapper() {}
 
-    public static Empresa toEntityCreate(EmpresaRequest req, PasswordEncoder encoder) {
+    public static Empresa toEntityCreate(EmpresaRequest req, SecretEncryptionService secretEncryptionService) {
         return Empresa.builder()
                 .id(UUID.randomUUID())
-                .razonSocial(req.getRazonSocial() != null ? req.getRazonSocial().toLowerCase().trim() : null)
-                .nombreLegal(req.getNombreLegal() != null ? req.getNombreLegal().toLowerCase().trim() : null)
-                .nombreComercial(req.getNombreComercial() != null ? req.getNombreComercial().toLowerCase().trim() : null)
-                .nit(req.getNit() != null ? req.getNit().trim() : null)
-                .registro(req.getRegistro() != null ? req.getRegistro().trim() : null)
-                .actividadEconomica(req.getActividadEconomica() != null ? req.getActividadEconomica().toLowerCase().trim() : null)
-                .sectorEmpresa(req.getSectorEmpresa() != null ? req.getSectorEmpresa().toLowerCase().trim() : null)
-                .email(req.getEmail() != null ? req.getEmail().toLowerCase().trim() : null)
-                .telefono(req.getTelefono() != null ? req.getTelefono().trim() : null)
-                .direccion(req.getDireccion() != null ? req.getDireccion().toLowerCase().trim() : null)
-                .ciudad(req.getCiudad() != null ? req.getCiudad().toLowerCase().trim() : null)
-                .codigoPostal(req.getCodigoPostal() != null ? req.getCodigoPostal().trim() : null)
-                .pais(req.getPais() != null ? req.getPais().toLowerCase().trim() : null)
-                .usuario(req.getUsuario() != null ? req.getUsuario().trim() : null)
-                .passwordHash(req.getPassword() != null ? encoder.encode(req.getPassword()) : null)
-                .clavePrimaria(req.getClavePrimaria() != null ? encoder.encode(req.getClavePrimaria()) : null)
-                .token(req.getToken())
+                .razonSocial(DataNormalizer.displayText(req.getRazonSocial()))
+                .nombreLegal(DataNormalizer.displayText(req.getNombreLegal()))
+                .nombreComercial(DataNormalizer.displayText(req.getNombreComercial()))
+                .nit(DataNormalizer.identifier(req.getNit()))
+                .registro(DataNormalizer.identifier(req.getRegistro()))
+                .actividadEconomica(DataNormalizer.displayText(req.getActividadEconomica()))
+                .sectorEmpresa(DataNormalizer.displayText(req.getSectorEmpresa()))
+                .email(DataNormalizer.email(req.getEmail()))
+                .telefono(DataNormalizer.phone(req.getTelefono()))
+                .direccion(DataNormalizer.displayText(req.getDireccion()))
+                .ciudad(DataNormalizer.displayText(req.getCiudad()))
+                .codigoPostal(DataNormalizer.identifier(req.getCodigoPostal()))
+                .pais(DataNormalizer.displayText(req.getPais()))
+                .usuario(DataNormalizer.displayText(req.getUsuario()))
+                .passwordHash(secretEncryptionService.encrypt(req.getPassword()))
+                .clavePrimaria(secretEncryptionService.encrypt(req.getClavePrimaria()))
+                .token(secretEncryptionService.encrypt(req.getToken()))
                 .expireToken(req.getExpireToken())
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
     }
 
-    public static void applyUpdate(Empresa e, EmpresaUpdateRequest req, PasswordEncoder encoder) {
-        if (req.getRazonSocial() != null) e.setRazonSocial(req.getRazonSocial().toLowerCase().trim());
-        if (req.getNombreLegal() != null) e.setNombreLegal(req.getNombreLegal().toLowerCase().trim());
-        if (req.getNombreComercial() != null) e.setNombreComercial(req.getNombreComercial().toLowerCase().trim());
-        if (req.getNit() != null) e.setNit(req.getNit().trim());
-        if (req.getRegistro() != null) e.setRegistro(req.getRegistro().trim());
-        if (req.getActividadEconomica() != null) e.setActividadEconomica(req.getActividadEconomica().toLowerCase().trim());
-        if (req.getSectorEmpresa() != null) e.setSectorEmpresa(req.getSectorEmpresa().toLowerCase().trim());
-        if (req.getEmail() != null) e.setEmail(req.getEmail().toLowerCase().trim());
-        if (req.getTelefono() != null) e.setTelefono(req.getTelefono().trim());
-        if (req.getDireccion() != null) e.setDireccion(req.getDireccion().toLowerCase().trim());
-        if (req.getCiudad() != null) e.setCiudad(req.getCiudad().toLowerCase().trim());
-        if (req.getCodigoPostal() != null) e.setCodigoPostal(req.getCodigoPostal().trim());
-        if (req.getPais() != null) e.setPais(req.getPais().toLowerCase().trim());
-        if (req.getUsuario() != null) e.setUsuario(req.getUsuario().trim());
-        if (req.getPassword() != null) e.setPasswordHash(encoder.encode(req.getPassword()));
-        if (req.getClavePrimaria() != null) e.setClavePrimaria(encoder.encode(req.getClavePrimaria()));
-        if (req.getToken() != null) e.setToken(req.getToken());
+    public static void applyBusinessUpdate(Empresa e, EmpresaUpdateRequest req) {
+        if (req.getRazonSocial() != null) e.setRazonSocial(DataNormalizer.displayText(req.getRazonSocial()));
+        if (req.getNombreLegal() != null) e.setNombreLegal(DataNormalizer.displayText(req.getNombreLegal()));
+        if (req.getNombreComercial() != null) e.setNombreComercial(DataNormalizer.displayText(req.getNombreComercial()));
+        if (req.getNit() != null) e.setNit(DataNormalizer.identifier(req.getNit()));
+        if (req.getRegistro() != null) e.setRegistro(DataNormalizer.identifier(req.getRegistro()));
+        if (req.getActividadEconomica() != null) e.setActividadEconomica(DataNormalizer.displayText(req.getActividadEconomica()));
+        if (req.getSectorEmpresa() != null) e.setSectorEmpresa(DataNormalizer.displayText(req.getSectorEmpresa()));
+        if (req.getEmail() != null) e.setEmail(DataNormalizer.email(req.getEmail()));
+        if (req.getTelefono() != null) e.setTelefono(DataNormalizer.phone(req.getTelefono()));
+        if (req.getDireccion() != null) e.setDireccion(DataNormalizer.displayText(req.getDireccion()));
+        if (req.getCiudad() != null) e.setCiudad(DataNormalizer.displayText(req.getCiudad()));
+        if (req.getCodigoPostal() != null) e.setCodigoPostal(DataNormalizer.identifier(req.getCodigoPostal()));
+        if (req.getPais() != null) e.setPais(DataNormalizer.displayText(req.getPais()));
+        if (req.getUsuario() != null) e.setUsuario(DataNormalizer.displayText(req.getUsuario()));
+        e.setUpdatedAt(OffsetDateTime.now());
+    }
+
+    public static void applyIntegrationCredentialsUpdate(Empresa e, EmpresaIntegrationUpdateRequest req, SecretEncryptionService secretEncryptionService) {
+        if (req.getPassword() != null) e.setPasswordHash(secretEncryptionService.encrypt(req.getPassword()));
+        if (req.getClavePrimaria() != null) e.setClavePrimaria(secretEncryptionService.encrypt(req.getClavePrimaria()));
+        if (req.getToken() != null) e.setToken(secretEncryptionService.encrypt(req.getToken()));
         if (req.getExpireToken() != null) e.setExpireToken(req.getExpireToken());
         e.setUpdatedAt(OffsetDateTime.now());
     }
@@ -80,7 +86,6 @@ public class EmpresaMapper {
                 .codigoPostal(e.getCodigoPostal())
                 .pais(e.getPais())
                 .usuario(e.getUsuario())
-                .token(e.getToken())
                 .expireToken(e.getExpireToken())
                 .monedas(monedas)
                 .createdAt(e.getCreatedAt())

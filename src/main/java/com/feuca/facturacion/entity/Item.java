@@ -41,6 +41,12 @@ public class Item {
     @Column(name = "precio_sin_iva", precision = 18, scale = 8)
     private BigDecimal precioSinIva;
 
+    @Column(name = "codigo_interno", length = 25)
+    private String codigoInterno;
+
+    @Column(name = "unidad_medida")
+    private Integer unidadMedida;
+
     @Column(name = "activo")
     private Boolean activo;
 

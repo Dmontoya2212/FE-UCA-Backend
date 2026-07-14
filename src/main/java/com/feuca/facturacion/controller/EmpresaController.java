@@ -1,6 +1,7 @@
 package com.feuca.facturacion.controller;
 
 import com.feuca.facturacion.dto.request.Empresa.EmpresaRequest;
+import com.feuca.facturacion.dto.request.Empresa.EmpresaIntegrationUpdateRequest;
 import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
 import com.feuca.facturacion.dto.request.Moneda.AddMonedaRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
@@ -199,6 +200,20 @@ public class EmpresaController {
 
         return ResponseBuilder.buildResponse(
                 "Monedas actualizadas.",
+                HttpStatus.OK,
+                empresa
+        );
+    }
+
+    @PatchMapping("/{id}/integracion")
+    public ResponseEntity<GeneralResponse> updateIntegracion(
+            @PathVariable UUID id,
+            @RequestBody @Valid EmpresaIntegrationUpdateRequest integrationUpdateRequest
+    ) {
+        EmpresaResponse empresa = empresaService.updateIntegration(id, integrationUpdateRequest);
+
+        return ResponseBuilder.buildResponse(
+                "Configuracion de integracion actualizada.",
                 HttpStatus.OK,
                 empresa
         );

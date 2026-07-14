@@ -16,4 +16,7 @@ public class MonedaResponse {
 
     @JsonProperty("simbolo")
     private String simbolo;
+
+    @JsonProperty("principal")
+    private Boolean principal;
 }
