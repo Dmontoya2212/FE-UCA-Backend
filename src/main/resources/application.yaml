@@ -3,9 +3,9 @@ spring:
     name: facturacion
 
   datasource:
-    url: ${DB_URL:}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/facturacion_electronica_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
     hikari:
@@ -33,7 +33,7 @@ spring:
     open-in-view: false
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:8080}
 
 logging:
   pattern:
@@ -43,7 +43,9 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_SQL_BIND_LEVEL:WARN}
 
 jwt:
-  secret: ${JWT_SECRET:}
+  # ATENCION: El valor por defecto es INSEGURO y SOLO PARA DESARROLLO LOCAL.
+  # En produccion (Render), OBLIGATORIAMENTE define la variable de entorno JWT_SECRET.
+  secret: ${JWT_SECRET:8a3c8e3a89f9b5b2e9d985a1c4990c8a6b6c0b3d88b48f6c3a1e9b2e9d8f7e6a}
   expiration-ms: ${JWT_EXPIRATION_MS:900000}
   issuer: ${JWT_ISSUER:feuca-facturacion}
 
@@ -61,7 +63,7 @@ security:
 
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+    allowed-origins: ${FRONTEND_URL:http://localhost:5173}
     allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
   database-initializer:
     enabled: ${DATABASE_INITIALIZER_ENABLED:false}
