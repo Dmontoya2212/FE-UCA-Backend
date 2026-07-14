@@ -78,10 +78,10 @@ public class Empresa {
     @Column(name = "usuario")
     private String usuario;
 
-    @Column(name = "password_hash")
+    @Column(name = "password_hash", columnDefinition = "TEXT")
     private String passwordHash;
 
-    @Column(name = "clave_primaria")
+    @Column(name = "clave_primaria", columnDefinition = "TEXT")
     private String clavePrimaria;
 
     @Column(name = "token", columnDefinition = "TEXT")

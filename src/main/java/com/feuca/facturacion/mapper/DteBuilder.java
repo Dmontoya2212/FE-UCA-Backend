@@ -2,10 +2,10 @@ package com.feuca.facturacion.mapper;
 
 import com.feuca.facturacion.dto.dte.*;
 import com.feuca.facturacion.entity.*;
+import com.feuca.facturacion.exception.Factura.FacturaValidationException;
 import com.feuca.facturacion.util.NumeroALetras;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +21,27 @@ public class DteBuilder {
             Empresa empresa,
             Cliente cliente,
             String numeroControl,
-            String codigoGeneracion
+            String codigoGeneracion,
+            String ambiente
     ) {
+        requireAllowed("ambiente DTE", ambiente, List.of("00", "01"));
+        requireNotBlank("numero de control DTE", numeroControl);
+        requireNotBlank("codigo de generacion DTE", codigoGeneracion);
+        requireNotNull("fecha de emision", factura.getFechaEmision());
+        requireAllowed("tipo DTE", factura.getTipoDte(), List.of("01"));
+        requireAllowed("moneda de la factura", factura.getMonedaCodigo(), List.of("USD"));
+        requireNotNull("subtotal de factura", factura.getSubtotalSinIva());
+        requireNotNull("total IVA de factura", factura.getTotalIva());
+        requireNotNull("total con IVA de factura", factura.getTotalConIva());
+
         String fecha = factura.getFechaEmision().format(DateTimeFormatter.ISO_LOCAL_DATE);
         String hora = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-
-        String tipoDte = factura.getTipoDte() != null ? factura.getTipoDte() : "01";
 
         // 1. Identificacion
         DteIdentificacion identificacion = DteIdentificacion.builder()
                 .version(2)
-                .ambiente("00") // TODO: leer de prop
-                .tipoDte(tipoDte)
+                .ambiente(ambiente)
+                .tipoDte(factura.getTipoDte())
                 .numeroControl(numeroControl)
                 .codigoGeneracion(codigoGeneracion)
                 .tipoModelo(1)
@@ -41,51 +50,51 @@ public class DteBuilder {
                 .motivoContin(null)
                 .fecEmi(fecha)
                 .horEmi(hora)
-                .tipoMoneda(factura.getMonedaCodigo() != null ? factura.getMonedaCodigo() : "USD")
+                .tipoMoneda(factura.getMonedaCodigo())
                 .build();
 
         // 2. Emisor
         DteDireccion dirEmisor = DteDireccion.builder()
-                .departamento(empresa.getDepartamento() != null ? empresa.getDepartamento() : "06")
-                .municipio(empresa.getMunicipio() != null ? empresa.getMunicipio() : "14")
-                .distrito(empresa.getDistrito() != null ? empresa.getDistrito() : "01")
-                .complemento(empresa.getDireccion() != null ? empresa.getDireccion() : "No provisto")
+                .departamento(required("departamento del emisor", coalesce(factura.getEmisorDepartamento(), empresa.getDepartamento())))
+                .municipio(required("municipio del emisor", coalesce(factura.getEmisorMunicipio(), empresa.getMunicipio())))
+                .distrito(required("distrito del emisor", coalesce(factura.getEmisorDistrito(), empresa.getDistrito())))
+                .complemento(required("direccion del emisor", coalesce(factura.getEmisorDireccion(), empresa.getDireccion())))
                 .build();
 
         DteEmisor emisor = DteEmisor.builder()
-                .nit(empresa.getNit())
-                .nrc(empresa.getRegistro())
-                .nombre(empresa.getRazonSocial())
-                .codActividad(empresa.getCodActividad() != null ? empresa.getCodActividad() : "62010")
-                .descActividad(empresa.getActividadEconomica() != null ? empresa.getActividadEconomica() : "Servicios")
-                .nombreComercial(empresa.getNombreComercial())
+                .nit(required("NIT del emisor", coalesce(factura.getEmisorNit(), empresa.getNit())))
+                .nrc(required("NRC del emisor", coalesce(factura.getEmisorNrc(), empresa.getRegistro())))
+                .nombre(required("nombre del emisor", coalesce(factura.getEmisorNombre(), empresa.getRazonSocial())))
+                .codActividad(required("codigo de actividad del emisor", coalesce(factura.getEmisorCodActividad(), empresa.getCodActividad())))
+                .descActividad(required("actividad economica del emisor", coalesce(factura.getEmisorDescActividad(), empresa.getActividadEconomica())))
+                .nombreComercial(coalesce(factura.getEmisorNombreComercial(), empresa.getNombreComercial(), null))
                 .direccion(dirEmisor)
-                .telefono(empresa.getTelefono() != null ? empresa.getTelefono() : "22222222")
-                .correo(empresa.getEmail() != null ? empresa.getEmail() : "no-reply@example.com")
-                .codEstable(empresa.getCodEstablecimiento() != null ? empresa.getCodEstablecimiento() : "M001")
-                .codPuntoVenta(empresa.getCodPuntoVenta() != null ? empresa.getCodPuntoVenta() : "P001")
+                .telefono(required("telefono del emisor", coalesce(factura.getEmisorTelefono(), empresa.getTelefono())))
+                .correo(required("correo del emisor", coalesce(factura.getEmisorEmail(), empresa.getEmail())))
+                .codEstable(required("codigo de establecimiento del emisor", coalesce(factura.getEmisorCodEstablecimiento(), empresa.getCodEstablecimiento())))
+                .codPuntoVenta(required("codigo de punto de venta del emisor", coalesce(factura.getEmisorCodPuntoVenta(), empresa.getCodPuntoVenta())))
                 .build();
 
         // 3. Receptor
         DteReceptor receptor = null;
         if (cliente != null) {
             DteDireccion dirReceptor = DteDireccion.builder()
-                    .departamento(cliente.getDepartamento() != null ? cliente.getDepartamento() : "06")
-                    .municipio(cliente.getMunicipio() != null ? cliente.getMunicipio() : "14")
-                    .distrito(cliente.getDistrito() != null ? cliente.getDistrito() : "01")
-                    .complemento(cliente.getDireccion() != null ? cliente.getDireccion() : "No provisto")
+                    .departamento(required("departamento del receptor", coalesce(factura.getClienteDepartamento(), cliente.getDepartamento())))
+                    .municipio(required("municipio del receptor", coalesce(factura.getClienteMunicipio(), cliente.getMunicipio())))
+                    .distrito(required("distrito del receptor", coalesce(factura.getClienteDistrito(), cliente.getDistrito())))
+                    .complemento(required("direccion del receptor", coalesce(factura.getClienteDireccion(), cliente.getDireccion())))
                     .build();
 
             receptor = DteReceptor.builder()
-                    .tipoDocumento(cliente.getTipoDocumento() != null ? cliente.getTipoDocumento() : "36") // 36=NIT
-                    .numDocumento(cliente.getNifCif())
-                    .nrc(cliente.getNrc())
-                    .nombre(cliente.getNombreRazonSocial())
-                    .codActividad(cliente.getCodActividad() != null ? cliente.getCodActividad() : "10005")
-                    .descActividad(cliente.getDescActividad() != null ? cliente.getDescActividad() : "Otros")
+                    .tipoDocumento(required("tipo de documento del receptor", coalesce(factura.getClienteTipoDocumento(), cliente.getTipoDocumento())))
+                    .numDocumento(required("numero de documento del receptor", coalesce(factura.getClienteNifCif(), cliente.getNifCif())))
+                    .nrc(coalesce(factura.getClienteNrc(), cliente.getNrc(), null))
+                    .nombre(required("nombre del receptor", coalesce(factura.getClienteNombreRazonSocial(), cliente.getNombreRazonSocial())))
+                    .codActividad(required("codigo de actividad del receptor", coalesce(factura.getClienteCodActividad(), cliente.getCodActividad())))
+                    .descActividad(required("actividad economica del receptor", coalesce(factura.getClienteDescActividad(), cliente.getDescActividad())))
                     .direccion(dirReceptor)
-                    .telefono(cliente.getTelefono())
-                    .correo(cliente.getEmail())
+                    .telefono(coalesce(factura.getClienteTelefono(), cliente.getTelefono(), null))
+                    .correo(coalesce(factura.getClienteEmail(), cliente.getEmail(), null))
                     .build();
         }
 
@@ -95,14 +104,27 @@ public class DteBuilder {
         for (FacturaLinea linea : lineas) {
             Item it = items.stream().filter(it2 -> it2.getId().equals(linea.getItemId())).findFirst().orElse(null);
             
-            Integer tipoItem = 2; // Default SERVICIO
-            String codInt = null;
-            Integer uniMedida = 59;
+            Integer tipoItem = linea.getItemTipo();
+            String codInt = linea.getItemCodigoInterno();
+            Integer uniMedida = linea.getItemUnidadMedida();
             if (it != null) {
-                tipoItem = (it.getCategoria() != null && it.getCategoria() == ItemCategoria.PRODUCTO) ? 1 : 2;
-                codInt = it.getCodigoInterno();
-                uniMedida = (it.getUnidadMedida() != null) ? it.getUnidadMedida() : 59;
+                if (linea.getItemTipo() == null) {
+                    tipoItem = (it.getCategoria() != null && it.getCategoria() == ItemCategoria.PRODUCTO) ? 1 : 2;
+                }
+                if (codInt == null) {
+                    codInt = it.getCodigoInterno();
+                }
+                if (linea.getItemUnidadMedida() == null) {
+                    uniMedida = it.getUnidadMedida();
+                }
             }
+            requireNotNull("tipo de item de la linea " + i, tipoItem);
+            requireNotNull("unidad de medida de la linea " + i, uniMedida);
+            requireNotBlank("descripcion de la linea " + i, linea.getDescripcion());
+            requireNotNull("cantidad de la linea " + i, linea.getCantidad());
+            requireNotNull("precio sin IVA de la linea " + i, linea.getPrecioSinIva());
+            requireNotNull("subtotal sin IVA de la linea " + i, linea.getSubtotalSinIva());
+            requireNotNull("total IVA de la linea " + i, linea.getTotalIva());
 
             DteCuerpoDocumento cd = DteCuerpoDocumento.builder()
                     .numItem(i++)
@@ -146,7 +168,7 @@ public class DteBuilder {
         BigDecimal montoTotalOperacion = subTotal.subtract(ivaRete);
         BigDecimal totalPagar = factura.getTotalConIva(); // should be equal to montoTotalOperacion + totalNoGravado
         
-        String totalLetras = NumeroALetras.convertir(totalPagar, "USD");
+        String totalLetras = NumeroALetras.convertir(totalPagar, factura.getMonedaCodigo());
 
         List<DtePago> pagos = List.of(
                 DtePago.builder()
@@ -194,5 +216,44 @@ public class DteBuilder {
                 .resumen(resumen)
                 .apendice(null)
                 .build();
+    }
+
+    private static String coalesce(String first, String second) {
+        if (first != null && !first.isBlank()) {
+            return first;
+        }
+        if (second != null && !second.isBlank()) {
+            return second;
+        }
+        return null;
+    }
+
+    private static String coalesce(String first, String second, String fallback) {
+        String value = coalesce(first, second);
+        return value != null ? value : fallback;
+    }
+
+    private static String required(String field, String value) {
+        requireNotBlank(field, value);
+        return value;
+    }
+
+    private static void requireNotBlank(String field, String value) {
+        if (value == null || value.isBlank()) {
+            throw new FacturaValidationException("Falta " + field + " para generar el DTE.");
+        }
+    }
+
+    private static void requireNotNull(String field, Object value) {
+        if (value == null) {
+            throw new FacturaValidationException("Falta " + field + " para generar el DTE.");
+        }
+    }
+
+    private static void requireAllowed(String field, String value, List<String> allowedValues) {
+        requireNotBlank(field, value);
+        if (!allowedValues.contains(value)) {
+            throw new FacturaValidationException("Valor no permitido para " + field + ": " + value);
+        }
     }
 }

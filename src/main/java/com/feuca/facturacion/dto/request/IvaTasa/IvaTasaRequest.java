@@ -14,7 +14,6 @@ import java.util.UUID;
 public class IvaTasaRequest {
 
     @JsonProperty("empresa_id")
-    @NotNull(message = "El ID de la empresa no puede ser nulo.")
     private UUID empresaId;
 
     @JsonProperty("nombre")
@@ -23,5 +22,11 @@ public class IvaTasaRequest {
 
     @JsonProperty("porcentaje")
     @NotNull(message = "El porcentaje no puede ser nulo.")
+    @DecimalMin(value = "0.00", message = "El porcentaje no puede ser menor a 0.")
+    @DecimalMax(value = "100.00", message = "El porcentaje no puede ser mayor a 100.")
+    @Digits(integer = 3, fraction = 2, message = "El porcentaje permite hasta 3 enteros y 2 decimales.")
     private BigDecimal porcentaje;
+
+    @JsonProperty("activo")
+    private Boolean activo;
 }

@@ -30,10 +30,6 @@ public class FacturaResponse {
     private BigDecimal totalIva;
     private BigDecimal totalConIva;
     private String tipoDte;
-    private String codigoGeneracion;
-    private String numeroControl;
-    private String selloRecibido;
-    private OffsetDateTime fechaRecepcion;
     private List<FacturaLineaResponse> lineas;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

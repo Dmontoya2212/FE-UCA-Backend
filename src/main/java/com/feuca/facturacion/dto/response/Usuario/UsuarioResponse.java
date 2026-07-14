@@ -14,7 +14,6 @@ public class UsuarioResponse {
     private java.util.List<UUID> empresaIds;
     private String nombre;
     private String email;
-    private Boolean esAdmin;
     private String rol;
     private Boolean activo;
     private OffsetDateTime createdAt;

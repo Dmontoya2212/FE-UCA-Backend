@@ -13,7 +13,6 @@ import java.util.UUID;
 public class ClienteRequest {
 
     @JsonProperty("empresa_id")
-    @NotNull(message = "El ID de la empresa no puede ser nulo.")
     private UUID empresaId;
 
     @JsonProperty("nombre_razon_social")

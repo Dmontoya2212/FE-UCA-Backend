@@ -37,7 +37,7 @@ public class Usuario {
     @Column(name = "es_admin", nullable = false)
     private Boolean esAdmin;
 
-    @Column(name = "rol", length = 20)
+    @Column(name = "rol", length = 20, nullable = false)
     private String rol;
 
     @Column(name = "activo", nullable = false)

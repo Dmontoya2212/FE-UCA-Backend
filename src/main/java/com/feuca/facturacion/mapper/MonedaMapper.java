@@ -1,6 +1,7 @@
 package com.feuca.facturacion.mapper;
 
 import com.feuca.facturacion.dto.response.Moneda.MonedaResponse;
+import com.feuca.facturacion.entity.EmpresaMoneda;
 import com.feuca.facturacion.entity.Moneda;
 
 import java.util.List;
@@ -15,6 +16,17 @@ public class MonedaMapper {
                 .codigo(moneda.getCodigo())
                 .nombre(moneda.getNombre())
                 .simbolo(moneda.getSimbolo())
+                .principal(false)
+                .build();
+    }
+
+    public static MonedaResponse toDTO(EmpresaMoneda relacion){
+        Moneda moneda = relacion.getMoneda();
+        return MonedaResponse.builder()
+                .codigo(moneda.getCodigo())
+                .nombre(moneda.getNombre())
+                .simbolo(moneda.getSimbolo())
+                .principal(Boolean.TRUE.equals(relacion.getPrincipal()))
                 .build();
     }
 

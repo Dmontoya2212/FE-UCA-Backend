@@ -21,6 +21,10 @@ public class EmpresaMoneda {
     @Column(name = "moneda_codigo", length = 3)
     private String moneda_codigo;
 
+    @Column(name = "principal", nullable = false)
+    @Builder.Default
+    private Boolean principal = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", insertable = false, updatable = false)
     private Empresa empresa;

@@ -27,8 +27,7 @@ public class UsuarioRequest {
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
-    private Boolean esAdmin;
-
+    @NotBlank(message = "El rol del usuario es obligatorio")
     private String rol;
 
 }

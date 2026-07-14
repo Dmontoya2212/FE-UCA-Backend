@@ -1,6 +1,7 @@
 package com.feuca.facturacion.dto.response.Auth;
 
 import lombok.*;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -9,10 +10,9 @@ import java.util.UUID;
 @Builder
 public class LoginResponse {
     private UUID id;
-    private UUID empresaId;
+    private List<UUID> empresaIds;
     private String nombre;
     private String email;
-    private Boolean esAdmin;
     private String rol;
     private String token;
 }

@@ -28,7 +28,6 @@ public class EmpresaResponse {
     private String codigoPostal;
     private String pais;
     private String usuario;
-    private String token;
     private String expireToken;
     private List<MonedaResponse> monedas;
     private OffsetDateTime createdAt;

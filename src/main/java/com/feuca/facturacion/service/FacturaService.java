@@ -2,6 +2,7 @@ package com.feuca.facturacion.service;
 
 import com.feuca.facturacion.dto.request.Factura.FacturaRequest;
 import com.feuca.facturacion.dto.request.Factura.FacturaUpdateRequest;
+import com.feuca.facturacion.dto.response.Factura.FacturaEmissionResponse;
 import com.feuca.facturacion.dto.response.Factura.FacturaResponse;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public interface FacturaService {
     FacturaResponse update(UUID empresaId, UUID facturaId, FacturaUpdateRequest request);
     void delete(UUID empresaId, UUID facturaId);
 
-    // Esto es lo que cambia el estado de la factura (Osea que cambia de Borrador a Enviada)(Gay el que lo lea)
-    FacturaResponse enviarAHacienda(UUID empresaId, UUID facturaId);
+    FacturaEmissionResponse prepararParaEnvio(UUID empresaId, UUID facturaId);
+
+    // Requiere integracion real; solo una respuesta aceptada de Hacienda debe marcar la factura como emitida.
+    FacturaEmissionResponse enviarAHacienda(UUID empresaId, UUID facturaId);
+    FacturaEmissionResponse enviarAHacienda(UUID empresaId, UUID facturaId, String idempotencyKey);
 }

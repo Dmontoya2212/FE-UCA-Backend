@@ -16,7 +16,6 @@ public class UsuarioUpdateRequest {
     @Email(message = "Correo Invalido")
     private String email;
 
-    private Boolean esAdmin;
     private String rol;
     private Boolean activo;
     private String password;

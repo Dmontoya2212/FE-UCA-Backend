@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: FE UCA Facturacion Electronica Backend
+  version: 0.1.0
+  description: Especificacion inicial de endpoints principales. Las respuestas usan el envoltorio GeneralResponse.
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Token JWT y datos del usuario.
+        '401':
+          description: Credenciales invalidas.
+  /api/v1/facturacion/empresa:
+    get:
+      summary: Listar empresas visibles para el usuario autenticado.
+      responses:
+        '200':
+          description: Lista de empresas.
+    post:
+      summary: Crear empresa.
+      description: Requiere SUPERADMIN.
+      responses:
+        '201':
+          description: Empresa creada.
+        '403':
+          description: Sin permiso.
+  /api/v1/facturacion/empresa/{id}:
+    get:
+      summary: Consultar empresa.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Empresa encontrada.
+        '404':
+          description: No encontrada.
+    patch:
+      summary: Actualizar datos de negocio de empresa.
+      description: No actualiza secretos de integracion.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Empresa actualizada.
+    delete:
+      summary: Eliminar o desactivar empresa.
+      description: Requiere SUPERADMIN.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Empresa eliminada.
+  /api/v1/facturacion/empresa/{id}/integracion:
+    patch:
+      summary: Actualizar credenciales de integracion.
+      description: Requiere SUPERADMIN. No devuelve secretos en texto plano.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Configuracion actualizada.
+  /api/v1/empresas/{empresaId}/clientes:
+    get:
+      summary: Listar clientes de empresa autorizada.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '200':
+          description: Clientes encontrados.
+    post:
+      summary: Crear cliente dentro de empresa autorizada.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '201':
+          description: Cliente creado.
+  /api/v1/empresas/{empresaId}/clientes/{id}:
+    get:
+      summary: Consultar cliente.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Cliente encontrado.
+    patch:
+      summary: Actualizar cliente.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Cliente actualizado.
+    delete:
+      summary: Borrado logico de cliente.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Cliente eliminado.
+  /api/v1/empresas/{empresaId}/items:
+    get:
+      summary: Listar items.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '200':
+          description: Items encontrados.
+    post:
+      summary: Crear item.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '201':
+          description: Item creado.
+  /api/v1/empresas/{empresaId}/iva:
+    get:
+      summary: Listar tasas IVA.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '200':
+          description: Tasas encontradas.
+    post:
+      summary: Crear tasa IVA.
+      description: Requiere ADMINISTRADOR o SUPERADMIN.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '201':
+          description: Tasa creada.
+  /api/v1/empresas/{empresaId}/facturas:
+    get:
+      summary: Listar facturas.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '200':
+          description: Facturas encontradas.
+    post:
+      summary: Crear factura en BORRADOR.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+      responses:
+        '201':
+          description: Factura creada.
+  /api/v1/empresas/{empresaId}/facturas/{id}:
+    get:
+      summary: Consultar factura.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Factura encontrada.
+    put:
+      summary: Actualizar factura en BORRADOR.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Factura actualizada.
+    delete:
+      summary: Eliminar factura editable.
+      description: No elimina facturas emitidas.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Factura eliminada.
+  /api/v1/empresas/{empresaId}/facturas/{id}/preparar-envio:
+    post:
+      summary: Validar y preparar DTE para envio.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: DTE listo para envio.
+  /api/v1/empresas/{empresaId}/facturas/{id}/enviar:
+    post:
+      summary: Enviar factura a Hacienda.
+      description: Requiere ADMINISTRADOR o SUPERADMIN. Soporta Idempotency-Key.
+      parameters:
+        - $ref: '#/components/parameters/empresaId'
+        - $ref: '#/components/parameters/id'
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Respuesta de Hacienda procesada.
+        '409':
+          description: Conflicto de estado o idempotencia.
+  /actuator/health:
+    get:
+      summary: Health probe.
+      security: []
+      responses:
+        '200':
+          description: Estado de salud.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    empresaId:
+      name: empresaId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    GeneralResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          nullable: true

@@ -1,6 +1,7 @@
 package com.feuca.facturacion.controller;
 
 import com.feuca.facturacion.dto.request.Empresa.EmpresaRequest;
+import com.feuca.facturacion.dto.request.Empresa.EmpresaIntegrationUpdateRequest;
 import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
 import com.feuca.facturacion.dto.request.Moneda.AddMonedaRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
@@ -166,22 +167,7 @@ public class EmpresaController {
 
     @GetMapping("")
     public ResponseEntity<GeneralResponse> getAll() {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        List<EmpresaResponse> empresas = java.util.Collections.emptyList();
-        
-        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("SUPERADMIN"))) {
-            empresas = empresaService.getAll();
-        } else if (auth != null) {
-            // Un-optimal but quick way without changing services/repos for this test
-            // We'll fetch from EmpresaService those IDs that belong to user
-            // To do this right, we need UsuarioRepository, but it's not injected.
-            // Let's just return what they are assigned if we had UsuarioRepository...
-            // Actually, for Phase 2, this is a minor thing. Let's just fetch all and let frontend filter, 
-            // OR let's just use a Bean lookup.
-        }
-
-        // Just returning all for now, to fix the compilation error I introduced
-        empresas = empresaService.getAll();
+        List<EmpresaResponse> empresas = empresaService.getAll();
 
         return ResponseBuilder.buildResponse(
                 "Empresas encontradas.",
@@ -214,6 +200,20 @@ public class EmpresaController {
 
         return ResponseBuilder.buildResponse(
                 "Monedas actualizadas.",
+                HttpStatus.OK,
+                empresa
+        );
+    }
+
+    @PatchMapping("/{id}/integracion")
+    public ResponseEntity<GeneralResponse> updateIntegracion(
+            @PathVariable UUID id,
+            @RequestBody @Valid EmpresaIntegrationUpdateRequest integrationUpdateRequest
+    ) {
+        EmpresaResponse empresa = empresaService.updateIntegration(id, integrationUpdateRequest);
+
+        return ResponseBuilder.buildResponse(
+                "Configuracion de integracion actualizada.",
                 HttpStatus.OK,
                 empresa
         );

@@ -1,6 +1,7 @@
 package com.feuca.facturacion.service;
 
 import com.feuca.facturacion.dto.request.Empresa.EmpresaRequest;
+import com.feuca.facturacion.dto.request.Empresa.EmpresaIntegrationUpdateRequest;
 import com.feuca.facturacion.dto.request.Empresa.EmpresaUpdateRequest;
 import com.feuca.facturacion.dto.request.Moneda.AddMonedaRequest;
 import com.feuca.facturacion.dto.response.Empresa.EmpresaResponse;
@@ -28,6 +29,7 @@ public interface EmpresaService {
 
     // UPDATE
     EmpresaResponse update(UUID idEmpresa, EmpresaUpdateRequest empresaRequest);
+    EmpresaResponse updateIntegration(UUID idEmpresa, EmpresaIntegrationUpdateRequest integrationRequest);
     EmpresaResponse updateMonedas(UUID idEmpresa, AddMonedaRequest monedas);
 
     // DELETE

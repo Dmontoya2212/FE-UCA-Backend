@@ -15,21 +15,30 @@ public class JwtService {
 
     private final SecretKey signingKey;
     private final long expirationMs;
+    private final String issuer;
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms}") long expirationMs) {
+            @Value("${jwt.expiration-ms}") long expirationMs,
+            @Value("${jwt.issuer}") String issuer) {
+        if (secret == null || secret.isBlank() || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalArgumentException("jwt.secret debe definirse fuera del repositorio y tener al menos 32 bytes.");
+        }
+        if (issuer == null || issuer.isBlank()) {
+            throw new IllegalArgumentException("jwt.issuer es obligatorio.");
+        }
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
+        this.issuer = issuer;
     }
 
-    public String generateToken(UUID userId, UUID empresaId, String email, String rol) {
+    public String generateToken(UUID userId, String email, String rol) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
+                .issuer(issuer)
                 .subject(userId.toString())
-                .claim("empresaId", empresaId.toString())
                 .claim("email", email)
                 .claim("rol", rol)
                 .issuedAt(now)
@@ -41,6 +50,7 @@ public class JwtService {
     public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(signingKey)
+                .requireIssuer(issuer)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -57,10 +67,6 @@ public class JwtService {
 
     public UUID getUserId(String token) {
         return UUID.fromString(parseToken(token).getSubject());
-    }
-
-    public UUID getEmpresaId(String token) {
-        return UUID.fromString(parseToken(token).get("empresaId", String.class));
     }
 
     public String getEmail(String token) {

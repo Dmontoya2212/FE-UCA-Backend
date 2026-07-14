@@ -20,9 +20,16 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     // Buscar item por nombre dentro de empresa
     Optional<Item> findByEmpresaIdAndNombre(UUID empresaId, String nombre);
+    Optional<Item> findByEmpresaIdAndNombreIgnoreCase(UUID empresaId, String nombre);
+
+    Optional<Item> findByIdAndEmpresaId(UUID id, UUID empresaId);
 
     // Validar si existe nombre dentro de empresa
     boolean existsByEmpresaIdAndNombre(UUID empresaId, String nombre);
+    boolean existsByEmpresaIdAndNombreIgnoreCase(UUID empresaId, String nombre);
+
+    Optional<Item> findByEmpresaIdAndCodigoInternoIgnoreCase(UUID empresaId, String codigoInterno);
+    boolean existsByEmpresaIdAndCodigoInternoIgnoreCase(UUID empresaId, String codigoInterno);
 
     // Listar por categoría (ENUM)
     List<Item> findAllByEmpresaIdAndCategoria(UUID empresaId, ItemCategoria categoria);

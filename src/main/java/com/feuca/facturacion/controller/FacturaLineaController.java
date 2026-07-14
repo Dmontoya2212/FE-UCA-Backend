@@ -5,6 +5,7 @@ import com.feuca.facturacion.dto.response.GeneralResponse;
 import com.feuca.facturacion.dto.response.FacturaLinea.FacturaLineaResponse;
 import com.feuca.facturacion.service.FacturaLineaService;
 import com.feuca.facturacion.util.ResponseBuilder;
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/facturacion/factura-linea")
+@RequestMapping("/api/v1/empresas/{empresaId}/facturas/{facturaId}/lineas")
 public class FacturaLineaController {
 
     private final FacturaLineaService facturaLineaService;
@@ -23,9 +24,9 @@ public class FacturaLineaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GeneralResponse> getById(
-            @PathVariable UUID id,
-            @RequestParam UUID empresaId,
-            @RequestParam UUID facturaId
+            @PathVariable UUID empresaId,
+            @PathVariable UUID facturaId,
+            @PathVariable UUID id
     ) {
         FacturaLineaResponse linea = facturaLineaService.getById(empresaId, facturaId, id);
         return ResponseBuilder.buildResponse("Detalle encontrado.", HttpStatus.OK, linea);
@@ -33,8 +34,8 @@ public class FacturaLineaController {
 
     @GetMapping()
     public ResponseEntity<GeneralResponse> getAll(
-            @RequestParam UUID empresaId,
-            @RequestParam UUID facturaId
+            @PathVariable UUID empresaId,
+            @PathVariable UUID facturaId
     ) {
         List<FacturaLineaResponse> lineas = facturaLineaService.getAllByFactura(empresaId, facturaId);
         return ResponseBuilder.buildResponse("Detalles encontrados.", HttpStatus.OK, lineas);
@@ -42,10 +43,10 @@ public class FacturaLineaController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<GeneralResponse> actualizar(
+            @PathVariable UUID empresaId,
+            @PathVariable UUID facturaId,
             @PathVariable UUID id,
-            @RequestParam UUID empresaId,
-            @RequestParam UUID facturaId,
-            @RequestBody FacturaLineaUpdateRequest request
+            @RequestBody @Valid FacturaLineaUpdateRequest request
     ) {
         FacturaLineaResponse linea = facturaLineaService.update(empresaId, facturaId, id, request);
         return ResponseBuilder.buildResponse("Detalle actualizado.", HttpStatus.OK, linea);
@@ -53,9 +54,9 @@ public class FacturaLineaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse> eliminar(
-            @PathVariable UUID id,
-            @RequestParam UUID empresaId,
-            @RequestParam UUID facturaId
+            @PathVariable UUID empresaId,
+            @PathVariable UUID facturaId,
+            @PathVariable UUID id
     ) {
         facturaLineaService.delete(empresaId, facturaId, id);
         return ResponseBuilder.buildResponse("Detalle eliminado.", HttpStatus.OK, null);

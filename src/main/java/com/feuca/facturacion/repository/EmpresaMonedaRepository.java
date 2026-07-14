@@ -15,6 +15,7 @@ public interface EmpresaMonedaRepository extends JpaRepository<EmpresaMoneda, Em
     List<EmpresaMoneda> findAllByEmpresa_id(UUID empresaId);
     List<EmpresaMoneda> findAllByEmpresa_idIn(List<UUID> empresaIds);
     List<EmpresaMoneda> findAllByMoneda_codigo(String monedaCodigo);
+    boolean existsByEmpresa_idAndMoneda_codigo(UUID empresaId, String monedaCodigo);
     
     //COUNT
     int countByMoneda_codigo(String monedaCodigo);

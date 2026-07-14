@@ -4,6 +4,7 @@ import com.feuca.facturacion.dto.request.Usuario.UsuarioRequest;
 import com.feuca.facturacion.dto.request.Usuario.UsuarioUpdateRequest;
 import com.feuca.facturacion.dto.response.Usuario.UsuarioResponse;
 import com.feuca.facturacion.entity.Usuario;
+import com.feuca.facturacion.util.DataNormalizer;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -17,9 +18,6 @@ public class UsuarioMapper {
 
     public static Usuario toEntityCreate(UsuarioRequest req, String passwordHash) {
         String rol = req.getRol();
-        if (rol == null || rol.isBlank()) {
-            rol = (req.getEsAdmin() != null && req.getEsAdmin()) ? "ADMINISTRADOR" : "USUARIO";
-        }
 
         java.util.List<Empresa> empresas = req.getEmpresaIds() != null ? 
             req.getEmpresaIds().stream().map(id -> Empresa.builder().id(id).build()).collect(Collectors.toList()) : 
@@ -28,10 +26,10 @@ public class UsuarioMapper {
         return Usuario.builder()
                 .id(UUID.randomUUID())
                 .empresas(empresas)
-                .nombre(req.getNombre())
-                .email(req.getEmail())
+                .nombre(DataNormalizer.displayText(req.getNombre()))
+                .email(DataNormalizer.email(req.getEmail()))
                 .passwordHash(passwordHash)
-                .esAdmin(req.getEsAdmin() != null ? req.getEsAdmin() : false)
+                .esAdmin(esAdminLegacyFromRol(rol))
                 .rol(rol)
                 .activo(true)
                 .createdAt(OffsetDateTime.now())
@@ -39,13 +37,19 @@ public class UsuarioMapper {
                 .build();
     }
 
-    public static void applyUpdate(Usuario u, UsuarioUpdateRequest req, String newPasswordHashOrNull) {
-        if (req.getNombre() != null) u.setNombre(req.getNombre());
-        if (req.getEmail() != null) u.setEmail(req.getEmail());
-        if (req.getEsAdmin() != null) u.setEsAdmin(req.getEsAdmin());
-        if (req.getRol() != null) u.setRol(req.getRol());
-        if (req.getActivo() != null) u.setActivo(req.getActivo());
+    public static void applyProfileUpdate(Usuario u, UsuarioUpdateRequest req, String newPasswordHashOrNull) {
+        if (req.getNombre() != null) u.setNombre(DataNormalizer.displayText(req.getNombre()));
+        if (req.getEmail() != null) u.setEmail(DataNormalizer.email(req.getEmail()));
         if (newPasswordHashOrNull != null) u.setPasswordHash(newPasswordHashOrNull);
+        u.setUpdatedAt(OffsetDateTime.now());
+    }
+
+    public static void applyAdminSecurityUpdate(Usuario u, UsuarioUpdateRequest req) {
+        if (req.getRol() != null) {
+            u.setRol(req.getRol());
+            u.setEsAdmin(esAdminLegacyFromRol(req.getRol()));
+        }
+        if (req.getActivo() != null) u.setActivo(req.getActivo());
         if (req.getEmpresaIds() != null) {
             u.setEmpresas(req.getEmpresaIds().stream()
                 .map(id -> Empresa.builder().id(id).build())
@@ -64,11 +68,14 @@ public class UsuarioMapper {
                 .empresaIds(empresaIds)
                 .nombre(u.getNombre())
                 .email(u.getEmail())
-                .esAdmin(u.getEsAdmin())
                 .rol(u.getRol())
                 .activo(u.getActivo())
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
                 .build();
+    }
+
+    private static boolean esAdminLegacyFromRol(String rol) {
+        return "SUPERADMIN".equals(rol) || "ADMINISTRADOR".equals(rol);
     }
 }
