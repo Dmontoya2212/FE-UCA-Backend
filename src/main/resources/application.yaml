@@ -3,8 +3,8 @@ spring:
     name: facturacion
 
   datasource:
-    url: ${DB_URL:}
-    username: ${DB_USERNAME:}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/facturacion_electronica_db}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
 
@@ -57,7 +57,7 @@ security:
       max-attempts: ${EMISSION_RATE_LIMIT_MAX_ATTEMPTS:10}
       window-seconds: ${EMISSION_RATE_LIMIT_WINDOW_SECONDS:60}
   secrets:
-    encryption-key: ${SECRET_ENCRYPTION_KEY:}
+    encryption-key: ${SECRET_ENCRYPTION_KEY:d0a124ca4adb62b1ed06b4aa632f2825fe44cedbb64c9b42dc7fac5df6d23382}
 
 app:
   cors:
@@ -67,10 +67,10 @@ app:
     enabled: ${DATABASE_INITIALIZER_ENABLED:false}
 
 dte:
-  ambiente: ${DTE_AMBIENTE:}
+  ambiente: ${DTE_AMBIENTE:00}
 
 hacienda:
-  endpoint: ${HACIENDA_ENDPOINT:}
+  endpoint: ${HACIENDA_ENDPOINT:http://localhost:8080}
   simulation-enabled: ${HACIENDA_SIMULATION_ENABLED:false}
 
 management:
