@@ -17,6 +17,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class JwtAuthenticationFilterTest {
@@ -71,6 +73,19 @@ class JwtAuthenticationFilterTest {
         filter.doFilter(requestWithToken("malformed.token"), new MockHttpServletResponse(), new MockFilterChain());
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
+
+    @Test
+    void optionsRequestBypassesJwtAuthentication() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("OPTIONS", "/api/v1/facturacion/cliente");
+        request.addHeader("Authorization", "Bearer malformed.token");
+        MockFilterChain filterChain = new MockFilterChain();
+
+        filter.doFilter(request, new MockHttpServletResponse(), filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        assertEquals(request, filterChain.getRequest());
+        verify(usuarioRepository, never()).findById(org.mockito.ArgumentMatchers.any());
     }
 
     private MockHttpServletRequest requestWithToken(String token) {
