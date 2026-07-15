@@ -14,6 +14,8 @@ import com.feuca.facturacion.exception.Factura.FacturaValidationException;
 import com.feuca.facturacion.exception.FacturaLinea.FacturaLineaNotFoundException;
 import com.feuca.facturacion.exception.Moneda.MonedaNotFoundException;
 import jakarta.persistence.OptimisticLockException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -38,6 +40,8 @@ import java.util.UUID;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     //Excepciones de EMPRESA
     @ExceptionHandler(EmpresaAlredyExistsException.class)
@@ -221,6 +225,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception e) {
+        log.error("Error inesperado: {}", e.getMessage(), e);
         return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrio un error inesperado.");
     }
 
