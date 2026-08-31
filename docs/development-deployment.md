@@ -19,7 +19,8 @@ El proyecto usa Flyway:
 - Formato: `V{numero}__descripcion.sql`
 - `ddl-auto` esta en `none`.
 - `flyway.clean-disabled=true`.
-- No usar `DatabaseInitializer` para datos productivos.
+- Las migraciones crean exclusivamente estructura; no incluyen datos semilla.
+- El primer `SUPERADMIN` y los catálogos se aprovisionan mediante un procedimiento operativo explícito.
 
 Antes de crear una migracion:
 
@@ -55,7 +56,6 @@ Checklist minimo:
 - `JWT_SECRET` y `SECRET_ENCRYPTION_KEY` provistos por gestor de secretos.
 - HTTPS terminado correctamente y `X-Forwarded-Proto` configurado si hay proxy.
 - `HACIENDA_SIMULATION_ENABLED=false`.
-- `DATABASE_INITIALIZER_ENABLED=false`.
 - Usuario de BD con privilegios minimos.
 - Migraciones Flyway ejecutadas y validadas.
 - Actuator conectado al sistema de monitoreo.

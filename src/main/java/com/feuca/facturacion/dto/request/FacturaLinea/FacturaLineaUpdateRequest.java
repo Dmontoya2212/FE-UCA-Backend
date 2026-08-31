@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Builder
 public class FacturaLineaUpdateRequest {
     private UUID itemId;
+    @Size(max = 220, message = "La descripción no puede exceder 220 caracteres.")
     private String descripcion;
 
     @Positive(message = "La cantidad debe ser mayor a 0.")

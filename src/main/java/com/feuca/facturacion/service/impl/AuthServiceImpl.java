@@ -14,10 +14,16 @@ import com.feuca.facturacion.util.DataNormalizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final String INVALID_CREDENTIALS = "Correo electrónico o contraseña incorrectos.";
+    private static final String DUMMY_PASSWORD_HASH =
+            "$2a$10$7EqJtq98hPqEX7fNZaFWoO5Yq4fH5ZQj6tQeKzYd8Y8Pc7gO5xE6W";
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,23 +59,32 @@ public class AuthServiceImpl implements AuthService {
     private LoginResponse doLogin(LoginRequest request) {
         String emailNormalizado = DataNormalizer.email(request.getEmail());
 
-        Usuario usuario = usuarioRepository.findByEmail(emailNormalizado)
-                .orElseThrow(() -> new InvalidCredentialsException("Correo electrónico o contraseña incorrectos."));
+        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail(emailNormalizado);
+        String storedHash = usuarioEncontrado
+                .map(Usuario::getPasswordHash)
+                .filter(hash -> !hash.isBlank())
+                .orElse(DUMMY_PASSWORD_HASH);
 
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
-            throw new InvalidCredentialsException("Correo electrónico o contraseña incorrectos.");
+        if (request.getPassword().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), storedHash);
+        if (usuarioEncontrado.isEmpty() || !passwordMatches) {
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
+        }
+        Usuario usuario = usuarioEncontrado.get();
+
         if (usuario.getActivo() == null || !usuario.getActivo()) {
-            throw new InvalidCredentialsException("El usuario se encuentra inactivo.");
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
         String rol = usuario.getRol();
         if (rol == null || rol.isBlank()) {
-            throw new InvalidCredentialsException("El usuario no tiene un rol asignado.");
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
         if (!List.of(AccessControlService.SUPERADMIN, AccessControlService.ADMINISTRADOR, AccessControlService.USUARIO).contains(rol)) {
-            throw new InvalidCredentialsException("El usuario tiene un rol no permitido.");
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
         List<java.util.UUID> empresaIds = usuario.getEmpresas() == null

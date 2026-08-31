@@ -22,6 +22,13 @@ public class ClienteMapper {
                 .ciudad(DataNormalizer.displayText(request.getCiudad()))
                 .codigoPostal(DataNormalizer.identifier(request.getCodigoPostal()))
                 .telefono(DataNormalizer.phone(request.getTelefono()))
+                .tipoDocumento(DataNormalizer.identifier(request.getTipoDocumento()))
+                .nrc(DataNormalizer.identifier(request.getNrc()))
+                .codActividad(DataNormalizer.identifier(request.getCodActividad()))
+                .descActividad(DataNormalizer.displayText(request.getDescActividad()))
+                .departamento(DataNormalizer.identifier(request.getDepartamento()))
+                .municipio(DataNormalizer.identifier(request.getMunicipio()))
+                .distrito(DataNormalizer.identifier(request.getDistrito()))
                 .activo(request.getActivo() != null ? request.getActivo() : true)
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
@@ -37,6 +44,13 @@ public class ClienteMapper {
         if (request.getCiudad() != null) entity.setCiudad(DataNormalizer.displayText(request.getCiudad()));
         if (request.getCodigoPostal() != null) entity.setCodigoPostal(DataNormalizer.identifier(request.getCodigoPostal()));
         if (request.getTelefono() != null) entity.setTelefono(DataNormalizer.phone(request.getTelefono()));
+        if (request.getTipoDocumento() != null) entity.setTipoDocumento(DataNormalizer.identifier(request.getTipoDocumento()));
+        if (request.getNrc() != null) entity.setNrc(DataNormalizer.identifier(request.getNrc()));
+        if (request.getCodActividad() != null) entity.setCodActividad(DataNormalizer.identifier(request.getCodActividad()));
+        if (request.getDescActividad() != null) entity.setDescActividad(DataNormalizer.displayText(request.getDescActividad()));
+        if (request.getDepartamento() != null) entity.setDepartamento(DataNormalizer.identifier(request.getDepartamento()));
+        if (request.getMunicipio() != null) entity.setMunicipio(DataNormalizer.identifier(request.getMunicipio()));
+        if (request.getDistrito() != null) entity.setDistrito(DataNormalizer.identifier(request.getDistrito()));
         if (request.getActivo() != null) entity.setActivo(request.getActivo());
 
         entity.setUpdatedAt(OffsetDateTime.now());
@@ -53,6 +67,13 @@ public class ClienteMapper {
                 .ciudad(entity.getCiudad())
                 .codigoPostal(entity.getCodigoPostal())
                 .telefono(entity.getTelefono())
+                .tipoDocumento(entity.getTipoDocumento())
+                .nrc(entity.getNrc())
+                .codActividad(entity.getCodActividad())
+                .descActividad(entity.getDescActividad())
+                .departamento(entity.getDepartamento())
+                .municipio(entity.getMunicipio())
+                .distrito(entity.getDistrito())
                 .activo(entity.getActivo())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

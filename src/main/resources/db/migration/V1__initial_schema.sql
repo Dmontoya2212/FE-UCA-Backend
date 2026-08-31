@@ -1,6 +1,10 @@
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'invoice_status') THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_type
+        WHERE typname = 'invoice_status'
+          AND typnamespace = current_schema()::regnamespace
+    ) THEN
         CREATE TYPE invoice_status AS ENUM (
             'BORRADOR',
             'LISTA_PARA_EMITIR',
@@ -13,7 +17,11 @@ BEGIN
         );
     END IF;
 
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'item_category') THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_type
+        WHERE typname = 'item_category'
+          AND typnamespace = current_schema()::regnamespace
+    ) THEN
         CREATE TYPE item_category AS ENUM ('SERVICIO', 'PRODUCTO', 'CONSULTORIA', 'OTRO');
     END IF;
 END $$;

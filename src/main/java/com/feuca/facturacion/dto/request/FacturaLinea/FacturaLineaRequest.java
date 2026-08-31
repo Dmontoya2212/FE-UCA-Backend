@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public class FacturaLineaRequest {
     private UUID itemId;
 
     @NotBlank
+    @Size(max = 220, message = "La descripción no puede exceder 220 caracteres.")
     @JsonProperty("descripcion")
     private String descripcion;
 

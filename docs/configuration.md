@@ -32,7 +32,6 @@
 | `EMISSION_RATE_LIMIT_MAX_ATTEMPTS` | `10` | Intentos de emision por ventana. |
 | `EMISSION_RATE_LIMIT_WINDOW_SECONDS` | `60` | Ventana de rate limit de emision. |
 | `MONITORING_SENDING_STALE_MINUTES` | `15` | Umbral para facturas `ENVIANDO` estancadas. |
-| `DATABASE_INITIALIZER_ENABLED` | `false` | Inicializador legado. Mantener apagado fuera de transicion controlada. |
 | `HACIENDA_SIMULATION_ENABLED` | `false` | Simulacion de envio. Nunca activar en prod. |
 
 ## Actuator

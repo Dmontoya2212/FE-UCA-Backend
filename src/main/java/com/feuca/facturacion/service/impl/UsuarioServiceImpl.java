@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -190,13 +191,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     private void validatePasswordPolicy(String password) {
-        if (password == null || password.length() < 8 || password.length() > 100
+        if (password == null || password.length() < 8
+                || password.getBytes(StandardCharsets.UTF_8).length > 72
                 || password.chars().anyMatch(Character::isWhitespace)
                 || password.chars().noneMatch(Character::isUpperCase)
                 || password.chars().noneMatch(Character::isLowerCase)
                 || password.chars().noneMatch(Character::isDigit)
                 || password.chars().noneMatch(ch -> !Character.isLetterOrDigit(ch))) {
-            throw new AccessDeniedException("La contrasena debe tener 8 a 100 caracteres, mayuscula, minuscula, numero, simbolo y no contener espacios.");
+            throw new AccessDeniedException("La contrasena debe tener 8 a 72 bytes, mayuscula, minuscula, numero, simbolo y no contener espacios.");
         }
     }
 }

@@ -58,8 +58,8 @@ public class SecurityConfig {
                                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "No autenticado.")))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Login is public
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // Only the login operation is public. Future auth endpoints stay closed by default.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // Health probes may be used by the platform; other actuator endpoints are restricted.
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/actuator/**").hasAuthority("SUPERADMIN")

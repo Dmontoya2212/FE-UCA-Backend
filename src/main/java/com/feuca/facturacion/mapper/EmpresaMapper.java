@@ -26,6 +26,7 @@ public class EmpresaMapper {
                 .nit(DataNormalizer.identifier(req.getNit()))
                 .registro(DataNormalizer.identifier(req.getRegistro()))
                 .actividadEconomica(DataNormalizer.displayText(req.getActividadEconomica()))
+                .codActividad(DataNormalizer.identifier(req.getCodActividad()))
                 .sectorEmpresa(DataNormalizer.displayText(req.getSectorEmpresa()))
                 .email(DataNormalizer.email(req.getEmail()))
                 .telefono(DataNormalizer.phone(req.getTelefono()))
@@ -33,6 +34,11 @@ public class EmpresaMapper {
                 .ciudad(DataNormalizer.displayText(req.getCiudad()))
                 .codigoPostal(DataNormalizer.identifier(req.getCodigoPostal()))
                 .pais(DataNormalizer.displayText(req.getPais()))
+                .departamento(DataNormalizer.identifier(req.getDepartamento()))
+                .municipio(DataNormalizer.identifier(req.getMunicipio()))
+                .distrito(DataNormalizer.identifier(req.getDistrito()))
+                .codEstablecimiento(DataNormalizer.identifier(req.getCodEstablecimiento()))
+                .codPuntoVenta(DataNormalizer.identifier(req.getCodPuntoVenta()))
                 .usuario(DataNormalizer.displayText(req.getUsuario()))
                 .passwordHash(secretEncryptionService.encrypt(req.getPassword()))
                 .clavePrimaria(secretEncryptionService.encrypt(req.getClavePrimaria()))
@@ -50,6 +56,7 @@ public class EmpresaMapper {
         if (req.getNit() != null) e.setNit(DataNormalizer.identifier(req.getNit()));
         if (req.getRegistro() != null) e.setRegistro(DataNormalizer.identifier(req.getRegistro()));
         if (req.getActividadEconomica() != null) e.setActividadEconomica(DataNormalizer.displayText(req.getActividadEconomica()));
+        if (req.getCodActividad() != null) e.setCodActividad(DataNormalizer.identifier(req.getCodActividad()));
         if (req.getSectorEmpresa() != null) e.setSectorEmpresa(DataNormalizer.displayText(req.getSectorEmpresa()));
         if (req.getEmail() != null) e.setEmail(DataNormalizer.email(req.getEmail()));
         if (req.getTelefono() != null) e.setTelefono(DataNormalizer.phone(req.getTelefono()));
@@ -57,6 +64,11 @@ public class EmpresaMapper {
         if (req.getCiudad() != null) e.setCiudad(DataNormalizer.displayText(req.getCiudad()));
         if (req.getCodigoPostal() != null) e.setCodigoPostal(DataNormalizer.identifier(req.getCodigoPostal()));
         if (req.getPais() != null) e.setPais(DataNormalizer.displayText(req.getPais()));
+        if (req.getDepartamento() != null) e.setDepartamento(DataNormalizer.identifier(req.getDepartamento()));
+        if (req.getMunicipio() != null) e.setMunicipio(DataNormalizer.identifier(req.getMunicipio()));
+        if (req.getDistrito() != null) e.setDistrito(DataNormalizer.identifier(req.getDistrito()));
+        if (req.getCodEstablecimiento() != null) e.setCodEstablecimiento(DataNormalizer.identifier(req.getCodEstablecimiento()));
+        if (req.getCodPuntoVenta() != null) e.setCodPuntoVenta(DataNormalizer.identifier(req.getCodPuntoVenta()));
         if (req.getUsuario() != null) e.setUsuario(DataNormalizer.displayText(req.getUsuario()));
         e.setUpdatedAt(OffsetDateTime.now());
     }
@@ -78,6 +90,7 @@ public class EmpresaMapper {
                 .nit(e.getNit())
                 .registro(e.getRegistro())
                 .actividadEconomica(e.getActividadEconomica())
+                .codActividad(e.getCodActividad())
                 .sectorEmpresa(e.getSectorEmpresa())
                 .email(e.getEmail())
                 .telefono(e.getTelefono())
@@ -85,6 +98,11 @@ public class EmpresaMapper {
                 .ciudad(e.getCiudad())
                 .codigoPostal(e.getCodigoPostal())
                 .pais(e.getPais())
+                .departamento(e.getDepartamento())
+                .municipio(e.getMunicipio())
+                .distrito(e.getDistrito())
+                .codEstablecimiento(e.getCodEstablecimiento())
+                .codPuntoVenta(e.getCodPuntoVenta())
                 .usuario(e.getUsuario())
                 .expireToken(e.getExpireToken())
                 .monedas(monedas)

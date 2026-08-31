@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.startsWith;
 
 class AuthServiceImplTest {
 
@@ -39,6 +40,23 @@ class AuthServiceImplTest {
             auditService,
             operationalMetricsService
     );
+
+    @Test
+    void unknownUserStillPerformsPasswordVerification() {
+        when(usuarioRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(InvalidCredentialsException.class, () -> authService.login(LoginRequest.builder()
+                .email("missing@example.com")
+                .password("secret")
+                .build()));
+
+        verify(passwordEncoder).matches(org.mockito.ArgumentMatchers.eq("secret"), startsWith("$2a$10$"));
+        verify(jwtService, never()).generateToken(
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()
+        );
+    }
 
     @Test
     void loginDoesNotSelectFirstEmpresaAsActiveEmpresa() {

@@ -31,6 +31,10 @@ $env:LOCAL_SECRET_ENCRYPTION_KEY="clave-base64-o-texto-seguro"
 
 El perfil local usa `application-local.yml`; produccion debe usar `prod` y variables sin valores por defecto sensibles.
 
+Flyway crea todas las tablas, tipos, restricciones e índices, pero no inserta empresas, usuarios,
+monedas, clientes, IVA, items ni facturas. El primer `SUPERADMIN` y los catálogos necesarios deben
+ser aprovisionados de forma explícita por el operador; el arranque de la API nunca crea datos de negocio.
+
 ## Pruebas
 
 ```powershell

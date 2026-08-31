@@ -71,10 +71,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
+        // Never trust a client-supplied forwarding header here. In production,
+        // server.forward-headers-strategy=framework resolves trusted proxy headers
+        // before the request reaches the application.
         return request.getRemoteAddr();
     }
 

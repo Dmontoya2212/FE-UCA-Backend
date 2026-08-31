@@ -20,6 +20,7 @@ public class EmpresaResponse {
     private String nit;
     private String registro;
     private String actividadEconomica;
+    private String codActividad;
     private String sectorEmpresa;
     private String email;
     private String telefono;
@@ -27,6 +28,11 @@ public class EmpresaResponse {
     private String ciudad;
     private String codigoPostal;
     private String pais;
+    private String departamento;
+    private String municipio;
+    private String distrito;
+    private String codEstablecimiento;
+    private String codPuntoVenta;
     private String usuario;
     private String expireToken;
     private List<MonedaResponse> monedas;

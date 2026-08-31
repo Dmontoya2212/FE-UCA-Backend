@@ -39,6 +39,27 @@ public class ClienteResponse {
     @JsonProperty("telefono")
     private String telefono;
 
+    @JsonProperty("tipo_documento")
+    private String tipoDocumento;
+
+    @JsonProperty("nrc")
+    private String nrc;
+
+    @JsonProperty("cod_actividad")
+    private String codActividad;
+
+    @JsonProperty("desc_actividad")
+    private String descActividad;
+
+    @JsonProperty("departamento")
+    private String departamento;
+
+    @JsonProperty("municipio")
+    private String municipio;
+
+    @JsonProperty("distrito")
+    private String distrito;
+
     @JsonProperty("activo")
     private Boolean activo;
 

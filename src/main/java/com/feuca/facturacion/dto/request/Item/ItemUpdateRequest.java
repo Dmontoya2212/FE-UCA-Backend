@@ -19,9 +19,11 @@ import java.util.UUID;
 public class ItemUpdateRequest {
 
     @JsonProperty("nombre")
+    @Size(max = 255, message = "El nombre del item no puede exceder 255 caracteres.")
     private String nombre;
 
     @JsonProperty("descripcion")
+    @Size(max = 255, message = "La descripción no puede exceder 255 caracteres.")
     private String descripcion;
 
     @JsonProperty("categoria")

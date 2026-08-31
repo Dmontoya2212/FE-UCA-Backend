@@ -23,6 +23,7 @@ public class FacturaRequest {
 
     private UUID clienteId;
 
+    @Size(max = 255, message = "El número no puede exceder 255 caracteres.")
     private String numero;
 
     @NotNull
@@ -34,9 +35,11 @@ public class FacturaRequest {
     private String monedaCodigo;
 
     @JsonProperty("tipo_dte")
+    @Size(max = 2, message = "El tipo DTE debe usar hasta 2 caracteres.")
     private String tipoDte;
 
     @NotEmpty
+    @Size(max = 1000, message = "Una factura no puede contener más de 1000 líneas.")
     @Valid
     @JsonProperty("lineas")
     private List<FacturaLineaRequest> lineas;

@@ -18,6 +18,7 @@ public class IvaTasaRequest {
 
     @JsonProperty("nombre")
     @NotBlank(message = "El nombre no puede estar vacío.")
+    @Size(max = 255, message = "El nombre no puede exceder 255 caracteres.")
     private String nombre;
 
     @JsonProperty("porcentaje")
