@@ -19,8 +19,10 @@ El proyecto usa Flyway:
 - Formato: `V{numero}__descripcion.sql`
 - `ddl-auto` esta en `none`.
 - `flyway.clean-disabled=true`.
-- Las migraciones crean exclusivamente estructura; no incluyen datos semilla.
-- El primer `SUPERADMIN` y los catálogos se aprovisionan mediante un procedimiento operativo explícito.
+- Las migraciones crean la estructura y una única cuenta inicial `SUPERADMIN`; no incluyen datos
+  de negocio ni catálogos semilla.
+- La contraseña inicial no se conserva en texto claro dentro del repositorio y debe rotarse después
+  del primer acceso.
 
 Antes de crear una migracion:
 

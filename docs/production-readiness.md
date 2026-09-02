@@ -13,7 +13,9 @@
 - Ejecutar revision de dependencias antes de liberar: `mvn versions:display-dependency-updates` y una herramienta de vulnerabilidades como OWASP Dependency Check o el escaner corporativo.
 - Mantener `hacienda.simulation-enabled=false` en produccion.
 - El perfil `prod` desactiva mensajes detallados de error, stack traces, SQL debug y reinicio devtools.
-- Verificar que el aprovisionamiento inicial de `SUPERADMIN` y monedas se ejecute una sola vez mediante un procedimiento administrativo; la aplicacion no contiene cuentas ni catalogos predeterminados.
+- Verificar que solo exista la cuenta inicial `SUPERADMIN`, rotar su contraseña antes de operar el
+  sistema y aprovisionar monedas mediante el procedimiento administrativo; no existen catálogos
+  predeterminados.
 
 ## Salud y monitoreo
 
